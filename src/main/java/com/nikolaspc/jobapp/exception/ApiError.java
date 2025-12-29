@@ -1,4 +1,4 @@
-package com.nikolaspc.jobapp.dto;
+package com.nikolaspc.jobapp.exception;
 
 import java.time.OffsetDateTime;
 import java.util.List;

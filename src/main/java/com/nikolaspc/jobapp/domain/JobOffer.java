@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "job_offers")
+@Table(name = "job_offers") // Matches SQL table name
 @Getter
 @Setter
 @NoArgsConstructor
@@ -37,11 +37,19 @@ public class JobOffer {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at") // Added to match SQL
+    private LocalDateTime updatedAt;
+
     @OneToMany(mappedBy = "jobOffer")
     private List<JobApplication> applications;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate // Added to automatically update the timestamp
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 }

@@ -11,6 +11,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
+      # En producción siempre 'none'. En desarrollo, Flyway se encarga de las tablas.
       ddl-auto: none
     show-sql: false
     properties:
@@ -23,10 +24,11 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
-    baseline-on-migrate: true
-    ignore-migration-schemas: true
+    # IMPORTANTE: Cambiado a false para que ejecute el script V1 en una BD limpia
+    baseline-on-migrate: false
+    # Reparar automáticamente si hay discrepancias de checksum en desarrollo
+    repair-on-migrate: true
 
-# Configuración de Swagger/OpenAPI
 springdoc:
   api-docs:
     path: /v3/api-docs
@@ -37,14 +39,19 @@ springdoc:
     operations-sorter: method
     tags-sorter: alpha
     try-it-out-enabled: true
-  show-actuator: false
+
+app:
+  jwt:
+    # Clave de 64 caracteres (512 bits) para cumplir con el estándar HS512 de JJWT 0.12.3
+    secret: ${APP_JWT_SECRET:EstaClaveEsSuperSecretaYTieneMasDeSesentaYCuatroCaracteresParaHS512SeguridadTotal}
+    expiration: 86400
 
 logging:
   level:
     root: INFO
     org.hibernate: WARN
     org.springframework.jdbc: WARN
+    # Debug útil para ver qué filtros de seguridad se están aplicando
     org.springframework.security: DEBUG
-    org.springdoc: DEBUG
-    com.Nikolaspc.jobapp: DEBUG
+    com.nikolaspc.jobapp: DEBUG
     org.springframework.web: DEBUG
