@@ -3,14 +3,15 @@ package com.nikolaspc.jobapp.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nikolaspc.jobapp.dto.CandidateDTO;
 import com.nikolaspc.jobapp.exception.ResourceNotFoundException;
+import com.nikolaspc.jobapp.security.JwtTokenProvider;
 import com.nikolaspc.jobapp.service.CandidateService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
@@ -25,14 +26,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Integration tests for CandidateController.
- * Tests HTTP endpoints with MockMvc, validating:
- * - Request/response mapping
- * - HTTP status codes
- * - JSON serialization/deserialization
- * - Error handling
+ * Se ha añadido MockitoBean para JwtTokenProvider para evitar fallos en el ApplicationContext.
  */
 @WebMvcTest(CandidateController.class)
-@AutoConfigureMockMvc(addFilters = false) // Disable security for tests
+@AutoConfigureMockMvc(addFilters = false) // Deshabilita filtros de seguridad para simplificar el test de controladores
 @DisplayName("CandidateController Integration Tests")
 class CandidateControllerIntegrationTest {
 
@@ -42,8 +39,15 @@ class CandidateControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private CandidateService service;
+
+    /**
+     * IMPORTANTE: Se inyecta este Mock para que JwtAuthenticationFilter no falle
+     * al intentar cargar el contexto de Spring.
+     */
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @Test
     @DisplayName("GET /api/candidates - Should return all candidates")
@@ -174,7 +178,7 @@ class CandidateControllerIntegrationTest {
         CandidateDTO invalidDTO = CandidateDTO.builder()
                 .firstName("Max")
                 .lastName("Mustermann")
-                .email("invalid-email") // Invalid format
+                .email("invalid-email")
                 .dateOfBirth(LocalDate.of(1995, 5, 15))
                 .build();
 
@@ -190,7 +194,7 @@ class CandidateControllerIntegrationTest {
     @Test
     @DisplayName("POST /api/candidates - Should return 400 with missing required fields")
     void createCandidate_WithMissingFields_ShouldReturn400() throws Exception {
-        // Arrange - Missing firstName and lastName
+        // Arrange
         String incompleteJson = "{\"email\":\"test@example.com\"}";
 
         // Act & Assert

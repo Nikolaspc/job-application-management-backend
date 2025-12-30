@@ -31,34 +31,46 @@ public class JobOfferServiceImpl implements JobOfferService {
 
     @Override
     @Transactional(readOnly = true)
+    public List<JobOfferResponseDTO> findActiveOffers() {
+        // Este método ahora funcionará porque ya existe en el JobOfferRepository
+        return repository.findByActiveTrue().stream()
+                .map(mapper::toResponseDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public JobOfferResponseDTO findById(Long id) {
         return repository.findById(id)
                 .map(mapper::toResponseDto)
-                .orElseThrow(() -> new ResourceNotFoundException("Job Offer not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Job Offer", id));
     }
 
     @Override
     @Transactional
     public JobOfferResponseDTO create(JobOfferRequestDTO dto) {
-        JobOffer entity = mapper.toEntity(dto);
-        return mapper.toResponseDto(repository.save(entity));
+        JobOffer jobOffer = mapper.toEntity(dto);
+        jobOffer.setActive(true);
+        JobOffer savedOffer = repository.save(jobOffer);
+        return mapper.toResponseDto(savedOffer);
     }
 
     @Override
     @Transactional
     public JobOfferResponseDTO update(Long id, JobOfferRequestDTO dto) {
-        JobOffer existingEntity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Job Offer not found with id: " + id));
+        JobOffer jobOffer = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Job Offer", id));
 
-        mapper.updateEntityFromDto(dto, existingEntity);
-        return mapper.toResponseDto(repository.save(existingEntity));
+        mapper.updateEntityFromDto(dto, jobOffer);
+        JobOffer updatedOffer = repository.save(jobOffer);
+        return mapper.toResponseDto(updatedOffer);
     }
 
     @Override
     @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
-            throw new ResourceNotFoundException("Job Offer not found with id: " + id);
+            throw new ResourceNotFoundException("Job Offer", id);
         }
         repository.deleteById(id);
     }

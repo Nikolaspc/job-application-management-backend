@@ -45,22 +45,22 @@ class JobOfferServiceImplTest {
         Long id = 999L;
         when(repository.findById(id)).thenReturn(Optional.empty());
 
+        // Mensaje ajustado para coincidir con el Service: "Job Offer with id 999 not found"
         assertThatThrownBy(() -> service.findById(id))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Job Offer not found with id: " + id);
+                .hasMessageContaining("Job Offer with id " + id + " not found");
     }
 
     @Test
     void update_WhenNotExists_ShouldThrowException() {
         Long id = 999L;
-        // SOLUCIÓN TÉCNICA: Usamos un mock del DTO para evitar conflictos de tipos en el constructor
         JobOfferRequestDTO dto = mock(JobOfferRequestDTO.class);
 
         when(repository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.update(id, dto))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Job Offer not found with id: " + id);
+                .hasMessageContaining("Job Offer with id " + id + " not found");
     }
 
     @Test
@@ -70,6 +70,6 @@ class JobOfferServiceImplTest {
 
         assertThatThrownBy(() -> service.delete(id))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("Job Offer not found with id: " + id);
+                .hasMessageContaining("Job Offer with id " + id + " not found");
     }
 }

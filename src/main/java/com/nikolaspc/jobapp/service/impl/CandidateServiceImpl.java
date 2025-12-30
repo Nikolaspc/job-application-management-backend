@@ -17,13 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of CandidateService with full CRUD operations.
- * Provides business logic for candidate management including:
- * - Candidate registration and profile management
- * - Email uniqueness validation
- * - Age verification (must be 18+)
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -39,8 +32,6 @@ public class CandidateServiceImpl implements CandidateService {
     public List<CandidateDTO> findAll() {
         log.info("Fetching all candidates");
         List<Candidate> candidates = repository.findAll();
-        log.info("Found {} candidates", candidates.size());
-
         return candidates.stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
@@ -50,66 +41,62 @@ public class CandidateServiceImpl implements CandidateService {
     @Transactional(readOnly = true)
     public CandidateDTO findById(Long id) {
         log.info("Fetching candidate with id: {}", id);
-
         Candidate candidate = repository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Candidate not found with id: {}", id);
-                    return new ResourceNotFoundException("Candidate", id);
-                });
-
-        log.info("Successfully retrieved candidate: {} {}",
-                candidate.getFirstName(), candidate.getLastName());
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", id));
         return mapper.toDto(candidate);
     }
 
     @Override
     @Transactional
     public CandidateDTO create(CandidateDTO dto) {
-        log.info("Creating new candidate with email: {}", dto.getEmail());
-
-        // Business validation: Check minimum age
+        log.info("Creating candidate: {}", dto.getEmail());
         validateAge(dto.getDateOfBirth());
-
-        // Convert DTO to entity
         Candidate candidate = mapper.toEntity(dto);
-
         try {
             Candidate savedCandidate = repository.save(candidate);
-            log.info("Successfully created candidate with id: {}", savedCandidate.getId());
             return mapper.toDto(savedCandidate);
-
         } catch (DataIntegrityViolationException e) {
-            log.error("Email already exists: {}", dto.getEmail());
-            throw new BadRequestException(
-                    "A candidate with email '" + dto.getEmail() + "' already exists"
-            );
+            throw new BadRequestException("A candidate with email '" + dto.getEmail() + "' already exists");
         }
     }
 
-    /**
-     * Validates that the candidate is at least 18 years old.
-     *
-     * @param dateOfBirth the candidate's birth date
-     * @throws BadRequestException if candidate is under 18
-     */
-    private void validateAge(LocalDate dateOfBirth) {
-        if (dateOfBirth == null) {
-            return; // Optional field
-        }
+    @Override
+    @Transactional
+    public CandidateDTO update(Long id, CandidateDTO dto) {
+        log.info("Updating candidate id: {}", id);
+        Candidate candidate = repository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", id));
 
+        validateAge(dto.getDateOfBirth());
+        mapper.updateEntityFromDto(dto, candidate);
+
+        try {
+            Candidate updatedCandidate = repository.save(candidate);
+            return mapper.toDto(updatedCandidate);
+        } catch (DataIntegrityViolationException e) {
+            throw new BadRequestException("Email '" + dto.getEmail() + "' is already in use");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        log.info("Deleting candidate id: {}", id);
+        if (!repository.existsById(id)) {
+            throw new ResourceNotFoundException("Candidate", id);
+        }
+        repository.deleteById(id);
+    }
+
+    private void validateAge(LocalDate dateOfBirth) {
+        if (dateOfBirth == null) return;
         LocalDate today = LocalDate.now();
         int age = today.getYear() - dateOfBirth.getYear();
-
-        // Adjust if birthday hasn't occurred this year
         if (today.getDayOfYear() < dateOfBirth.getDayOfYear()) {
             age--;
         }
-
         if (age < MIN_AGE) {
-            log.warn("Candidate age validation failed. Age: {}, Required: {}", age, MIN_AGE);
-            throw new BadRequestException(
-                    "Candidate must be at least " + MIN_AGE + " years old"
-            );
+            throw new BadRequestException("Candidate must be at least " + MIN_AGE + " years old");
         }
     }
 }
