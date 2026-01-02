@@ -3,6 +3,7 @@ package com.nikolaspc.jobapp.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
 import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -27,5 +28,6 @@ public class CandidateDTO {
     private String email;
 
     @NotNull(message = "Date of birth is required")
+    @Past(message = "Date of birth must be in the past") // Mejora: Validación lógica
     private LocalDate dateOfBirth;
 }

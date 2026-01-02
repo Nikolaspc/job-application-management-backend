@@ -7,19 +7,19 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * Repository para User entity
- * Extiende JpaRepository para operaciones básicas CRUD
+ * Repository for User entity
+ * Extends JpaRepository for basic CRUD operations
  */
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
     /**
-     * Encuentra un usuario por email
+     * Finds a user by email
      */
     Optional<User> findByEmail(String email);
 
     /**
-     * Verifica si un usuario con ese email existe
+     * Checks if a user with that email exists
      */
     boolean existsByEmail(String email);
 }

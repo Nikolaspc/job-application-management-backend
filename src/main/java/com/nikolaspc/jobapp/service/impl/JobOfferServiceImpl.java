@@ -12,34 +12,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true) // Default: optimizado para lectura
 public class JobOfferServiceImpl implements JobOfferService {
 
     private final JobOfferRepository repository;
     private final JobOfferMapper mapper;
 
     @Override
-    @Transactional(readOnly = true)
     public List<JobOfferResponseDTO> findAll() {
         return repository.findAll().stream()
                 .map(mapper::toResponseDto)
-                .collect(Collectors.toList());
+                .toList(); // .toList() es Java 16+, más limpio que Collectors.toList()
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<JobOfferResponseDTO> findActiveOffers() {
-        // Este método ahora funcionará porque ya existe en el JobOfferRepository
         return repository.findByActiveTrue().stream()
                 .map(mapper::toResponseDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
-    @Transactional(readOnly = true)
     public JobOfferResponseDTO findById(Long id) {
         return repository.findById(id)
                 .map(mapper::toResponseDto)
@@ -47,10 +43,10 @@ public class JobOfferServiceImpl implements JobOfferService {
     }
 
     @Override
-    @Transactional
+    @Transactional // Sobrescribe el readOnly=true de la clase
     public JobOfferResponseDTO create(JobOfferRequestDTO dto) {
+        // El mapper ya setea active=true gracias a la config 'constant'
         JobOffer jobOffer = mapper.toEntity(dto);
-        jobOffer.setActive(true);
         JobOffer savedOffer = repository.save(jobOffer);
         return mapper.toResponseDto(savedOffer);
     }

@@ -15,31 +15,32 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CandidateController {
 
-    private final CandidateService service;
+    private final CandidateService candidateService;
 
     @GetMapping
-    public ResponseEntity<List<CandidateDTO>> getAll() {
-        return ResponseEntity.ok(service.findAll());
+    public ResponseEntity<List<CandidateDTO>> getAllCandidates() {
+        return ResponseEntity.ok(candidateService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CandidateDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(service.findById(id));
+    public ResponseEntity<CandidateDTO> getCandidateById(@PathVariable Long id) {
+        return ResponseEntity.ok(candidateService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<CandidateDTO> create(@Valid @RequestBody CandidateDTO dto) { // <--- @Valid añadido
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
+    public ResponseEntity<CandidateDTO> createCandidate(@Valid @RequestBody CandidateDTO candidateDTO) {
+        // Correctly calls .save() from CandidateService interface
+        return new ResponseEntity<>(candidateService.save(candidateDTO), HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CandidateDTO> update(@PathVariable Long id, @Valid @RequestBody CandidateDTO dto) { // <--- @Valid añadido
-        return ResponseEntity.ok(service.update(id, dto));
+    public ResponseEntity<CandidateDTO> updateCandidate(@PathVariable Long id, @Valid @RequestBody CandidateDTO candidateDTO) {
+        return ResponseEntity.ok(candidateService.update(id, candidateDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> deleteCandidate(@PathVariable Long id) {
+        candidateService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

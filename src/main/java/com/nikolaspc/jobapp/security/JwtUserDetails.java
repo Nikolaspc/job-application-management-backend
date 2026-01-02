@@ -1,16 +1,14 @@
 package com.nikolaspc.jobapp.security;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-/**
- * Objeto personalizado que contiene información del JWT
- * Se usa para almacenar detalles en el Authentication object
- */
-@Data
+@Getter
+@NoArgsConstructor
 @AllArgsConstructor
 public class JwtUserDetails {
-    private Long userId;
+    private Long id;
     private String email;
     private String role;
 }

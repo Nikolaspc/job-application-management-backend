@@ -16,10 +16,12 @@ public class JobApplication {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "candidate_id", nullable = false)
     private Candidate candidate;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "job_offer_id", nullable = false)
     private JobOffer jobOffer;
 
     @Column(nullable = false)

@@ -10,8 +10,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,24 +19,24 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Authentication Controller
  *
- * Endpoints para:
- * - POST /api/auth/register - Registrar nuevo usuario
- * - POST /api/auth/login - Login y obtener JWT token
+ * Endpoints for:
+ * - POST /api/auth/register - Register new user
+ * - POST /api/auth/login - Login and obtain JWT token
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 @Tag(name = "Authentication", description = "User registration and login endpoints")
 public class AuthController {
 
-    @Autowired
-    private AuthService authService;
+    private final AuthService authService;
 
     /**
-     * Registrar nuevo usuario
+     * Register new user
      *
-     * @param request RegisterRequest con datos del usuario
-     * @return AuthResponse con JWT token
+     * @param request RegisterRequest with user data
+     * @return AuthResponse with JWT token
      */
     @PostMapping("/register")
     @Operation(summary = "Register new user",
@@ -47,8 +47,6 @@ public class AuthController {
                     schema = @Schema(implementation = AuthResponse.class)))
     @ApiResponse(responseCode = "400",
             description = "Invalid input or email already exists")
-    @ApiResponse(responseCode = "500",
-            description = "Internal server error")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         log.info("Register request received for email: {}", request.getEmail());
         AuthResponse response = authService.register(request);
@@ -56,10 +54,10 @@ public class AuthController {
     }
 
     /**
-     * Login de usuario
+     * User login
      *
-     * @param request AuthRequest con email y contraseña
-     * @return AuthResponse con JWT token
+     * @param request AuthRequest with email and password
+     * @return AuthResponse with JWT token
      */
     @PostMapping("/login")
     @Operation(summary = "Login user",
@@ -70,8 +68,6 @@ public class AuthController {
                     schema = @Schema(implementation = AuthResponse.class)))
     @ApiResponse(responseCode = "401",
             description = "Invalid credentials")
-    @ApiResponse(responseCode = "500",
-            description = "Internal server error")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         log.info("Login request received for email: {}", request.getEmail());
         AuthResponse response = authService.login(request);

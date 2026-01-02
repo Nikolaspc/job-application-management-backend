@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +36,7 @@ public class JobApplicationController {
             @ApiResponse(responseCode = "404", description = "Application not found")
     })
     public ResponseEntity<JobApplicationDTO> getById(@PathVariable Long id) {
+        // En un futuro, un GlobalExceptionHandler convertirá el RuntimeException en 404
         return ResponseEntity.ok(service.findById(id));
     }
 
@@ -45,6 +47,6 @@ public class JobApplicationController {
             @ApiResponse(responseCode = "400", description = "Invalid application data")
     })
     public ResponseEntity<JobApplicationDTO> create(@RequestBody @Valid JobApplicationDTO dto) {
-        return ResponseEntity.status(201).body(service.create(dto));
+        return new ResponseEntity<>(service.create(dto), HttpStatus.CREATED);
     }
 }

@@ -11,4 +11,9 @@ public interface JobApplicationMapper {
     @Mapping(source = "candidate.id", target = "candidateId")
     @Mapping(source = "jobOffer.id", target = "jobOfferId")
     JobApplicationDTO toDto(JobApplication entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "candidate", ignore = true) // Se asignará manualmente en el Service
+    @Mapping(target = "jobOffer", ignore = true)   // Se asignará manualmente en el Service
+    JobApplication toEntity(JobApplicationDTO dto);
 }

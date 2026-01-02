@@ -23,14 +23,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-/**
- * Spring Security Configuration with JWT
- * * Synchronized with JobOfferController paths (/api/jobs)
- */
 @Slf4j
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Autowired
@@ -41,31 +37,28 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        log.info("Configuring Spring Security with JWT and synchronized paths");
+        log.info("Initializing Security Filter Chain");
 
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                        // Public endpoints
+                        // Public Endpoints
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        .requestMatchers("/actuator/health/**").permitAll()
 
-                        // Jobs endpoints - Synchronized with @RequestMapping("/api/jobs")
+                        // Jobs Access
                         .requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/jobs").hasAnyRole("ADMIN", "RECRUITER")
-                        .requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasAnyRole("ADMIN", "RECRUITER")
-                        .requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("ADMIN")
 
-                        // Other protected resources
-                        .requestMatchers("/api/candidates/**").authenticated()
-                        .requestMatchers("/api/applications/**").authenticated()
+                        // Admin/Actuator Access
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
+
+                        // Any other request
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                );
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint));
 
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
@@ -85,10 +78,6 @@ public class SecurityConfig {
         return source;
     }
 
-    /**
-     * BCrypt Password Encoder
-     * Must match the strength (12) used in the SQL hash.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);

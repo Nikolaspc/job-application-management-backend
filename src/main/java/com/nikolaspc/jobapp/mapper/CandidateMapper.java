@@ -14,5 +14,6 @@ public interface CandidateMapper {
     @Mapping(target = "id", ignore = true)
     Candidate toEntity(CandidateDTO dto);
 
+    @Mapping(target = "id", ignore = true)
     void updateEntityFromDto(CandidateDTO dto, @MappingTarget Candidate entity);
 }

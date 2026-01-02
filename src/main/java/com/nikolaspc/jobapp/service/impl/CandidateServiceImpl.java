@@ -31,8 +31,7 @@ public class CandidateServiceImpl implements CandidateService {
     @Transactional(readOnly = true)
     public List<CandidateDTO> findAll() {
         log.info("Fetching all candidates");
-        List<Candidate> candidates = repository.findAll();
-        return candidates.stream()
+        return repository.findAll().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -41,15 +40,16 @@ public class CandidateServiceImpl implements CandidateService {
     @Transactional(readOnly = true)
     public CandidateDTO findById(Long id) {
         log.info("Fetching candidate with id: {}", id);
-        Candidate candidate = repository.findById(id)
+        return repository.findById(id)
+                .map(mapper::toDto)
                 .orElseThrow(() -> new ResourceNotFoundException("Candidate", id));
-        return mapper.toDto(candidate);
     }
 
+    // Cambiado de 'create' a 'save' para cumplir con el contrato de la Interfaz
     @Override
     @Transactional
-    public CandidateDTO create(CandidateDTO dto) {
-        log.info("Creating candidate: {}", dto.getEmail());
+    public CandidateDTO save(CandidateDTO dto) {
+        log.info("Saving candidate: {}", dto.getEmail());
         validateAge(dto.getDateOfBirth());
         Candidate candidate = mapper.toEntity(dto);
         try {
@@ -92,7 +92,8 @@ public class CandidateServiceImpl implements CandidateService {
         if (dateOfBirth == null) return;
         LocalDate today = LocalDate.now();
         int age = today.getYear() - dateOfBirth.getYear();
-        if (today.getDayOfYear() < dateOfBirth.getDayOfYear()) {
+        if (today.getMonthValue() < dateOfBirth.getMonthValue() ||
+                (today.getMonthValue() == dateOfBirth.getMonthValue() && today.getDayOfMonth() < dateOfBirth.getDayOfMonth())) {
             age--;
         }
         if (age < MIN_AGE) {

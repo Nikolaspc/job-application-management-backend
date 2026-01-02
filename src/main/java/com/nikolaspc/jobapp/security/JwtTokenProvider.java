@@ -17,44 +17,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * JwtTokenProvider actualizado para JJWT 0.12.x
- * Implementa la lógica de generación, validación y extracción de claims.
+ * JwtTokenProvider updated for JJWT 0.12.x
  */
 @Slf4j
 @Component
 public class JwtTokenProvider {
 
-    @Value("${app.jwt.secret:MyVerySecureSecretKeyForJWTThatMustBeAtLeast32CharactersLongForHS512AlgorithmSecurity}")
+    @Value("${app.jwt.secret}")
     private String jwtSecret;
 
-    @Value("${app.jwt.expiration:86400}")
-    private long jwtExpirationMs;
+    @Value("${app.jwt.expiration}")
+    private long jwtExpirationInSeconds;
 
-    /**
-     * Genera la llave de firma asegurando el encoding correcto.
-     */
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    /**
-     * Genera JWT token a partir de la entidad User.
-     */
     public String generateToken(User user) {
         return generateTokenFromUserDetails(user.getEmail(), user.getRole(), user.getId());
     }
 
-    /**
-     * Crea el token con claims personalizados.
-     */
     private String generateTokenFromUserDetails(String email, UserRole role, Long userId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role.toString());
+        claims.put("role", role.name());
         claims.put("userId", userId);
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationMs * 1000);
+        // Convert seconds from config to milliseconds for Date
+        Date expiryDate = new Date(now.getTime() + (jwtExpirationInSeconds * 1000));
 
         return Jwts.builder()
                 .claims(claims)
@@ -75,12 +66,14 @@ public class JwtTokenProvider {
     }
 
     public Long getUserIdFromToken(String token) {
-        return getClaims(token).get("userId", Long.class);
+        // Safe extraction of Long from claims
+        Object userId = getClaims(token).get("userId");
+        if (userId instanceof Integer) {
+            return ((Integer) userId).longValue();
+        }
+        return (Long) userId;
     }
 
-    /**
-     * Valida la integridad y expiración del token.
-     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -106,9 +99,6 @@ public class JwtTokenProvider {
         }
     }
 
-    /**
-     * Extrae todos los claims del token.
-     */
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .verifyWith(getSigningKey())
@@ -117,11 +107,7 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 
-    /**
-     * Retorna el tiempo de expiración configurado en segundos.
-     * Requerido por AuthService para la construcción de AuthResponse.
-     */
     public long getTokenExpirationSeconds() {
-        return jwtExpirationMs;
+        return jwtExpirationInSeconds;
     }
 }

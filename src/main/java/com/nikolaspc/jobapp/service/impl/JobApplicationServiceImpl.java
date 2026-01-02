@@ -20,13 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Implementation of JobApplicationService with full CRUD operations.
- * Manages job applications with business rules:
- * - Prevents duplicate applications (same candidate + job offer)
- * - Validates job offer is active before allowing application
- * - Manages application status workflow
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,10 +36,7 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     @Transactional(readOnly = true)
     public List<JobApplicationDTO> findAll() {
         log.info("Fetching all job applications");
-        List<JobApplication> applications = applicationRepository.findAll();
-        log.info("Found {} applications", applications.size());
-
-        return applications.stream()
+        return applicationRepository.findAll().stream()
                 .map(mapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -55,85 +45,53 @@ public class JobApplicationServiceImpl implements JobApplicationService {
     @Transactional(readOnly = true)
     public JobApplicationDTO findById(Long id) {
         log.info("Fetching job application with id: {}", id);
-
-        JobApplication application = applicationRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Job application not found with id: {}", id);
-                    return new ResourceNotFoundException("Job Application", id);
-                });
-
-        log.info("Successfully retrieved application id: {}", application.getId());
-        return mapper.toDto(application);
+        return applicationRepository.findById(id)
+                .map(mapper::toDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Job Application", id));
     }
 
     @Override
     @Transactional
     public JobApplicationDTO create(JobApplicationDTO dto) {
-        log.info("Creating job application - Candidate: {}, Job Offer: {}",
-                dto.getCandidateId(), dto.getJobOfferId());
+        log.info("Creating application - Candidate ID: {}, Offer ID: {}", dto.getCandidateId(), dto.getJobOfferId());
 
-        // Validate candidate exists
         Candidate candidate = candidateRepository.findById(dto.getCandidateId())
-                .orElseThrow(() -> {
-                    log.error("Candidate not found with id: {}", dto.getCandidateId());
-                    return new ResourceNotFoundException("Candidate", dto.getCandidateId());
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Candidate", dto.getCandidateId()));
 
-        // Validate job offer exists
         JobOffer jobOffer = jobOfferRepository.findById(dto.getJobOfferId())
-                .orElseThrow(() -> {
-                    log.error("Job offer not found with id: {}", dto.getJobOfferId());
-                    return new ResourceNotFoundException("Job Offer", dto.getJobOfferId());
-                });
+                .orElseThrow(() -> new ResourceNotFoundException("Job Offer", dto.getJobOfferId()));
 
-        // Business rule: Job offer must be active
-        if (!jobOffer.isActive()) {
-            log.warn("Attempted to apply to inactive job offer id: {}", jobOffer.getId());
-            throw new BadRequestException(
-                    "Cannot apply to inactive job offer: " + jobOffer.getTitle()
-            );
+        // Business Rule: Offer must be active
+        // Logic updated to use getActive() because of Boolean type in Entity
+        if (jobOffer.getActive() == null || !jobOffer.getActive()) {
+            throw new BadRequestException("Cannot apply to inactive job offer: " + jobOffer.getTitle());
         }
 
-        // Build application entity
-        JobApplication application = JobApplication.builder()
-                .candidate(candidate)
-                .jobOffer(jobOffer)
-                .status(dto.getStatus() != null ? dto.getStatus() : DEFAULT_STATUS)
-                .build();
+        // Map basic fields and set relationships manually
+        JobApplication application = mapper.toEntity(dto);
+        application.setCandidate(candidate);
+        application.setJobOffer(jobOffer);
+
+        if (application.getStatus() == null) {
+            application.setStatus(DEFAULT_STATUS);
+        }
 
         try {
-            JobApplication savedApplication = applicationRepository.save(application);
-            log.info("Successfully created application with id: {}", savedApplication.getId());
-            return mapper.toDto(savedApplication);
-
+            return mapper.toDto(applicationRepository.save(application));
         } catch (DataIntegrityViolationException e) {
-            log.error("Duplicate application attempt - Candidate: {}, Job Offer: {}",
-                    dto.getCandidateId(), dto.getJobOfferId());
-            throw new BadRequestException(
-                    "Candidate has already applied to this job offer"
-            );
+            log.error("Conflict: Candidate {} already applied to offer {}", dto.getCandidateId(), dto.getJobOfferId());
+            throw new BadRequestException("Candidate has already applied to this job offer");
         }
     }
 
-    /**
-     * Updates application status (e.g., PENDING -> REVIEWED -> ACCEPTED/REJECTED).
-     * This method can be extended for complete update functionality.
-     *
-     * @param id application ID
-     * @param newStatus the new status
-     * @return updated application DTO
-     */
+    @Override
     @Transactional
     public JobApplicationDTO updateStatus(Long id, String newStatus) {
         log.info("Updating application {} status to: {}", id, newStatus);
-
         JobApplication application = applicationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job Application", id));
 
         application.setStatus(newStatus);
-        JobApplication updated = applicationRepository.save(application);
-
-        log.info("Successfully updated application {} status", id);
-        return mapper.toDto(updated);
+        return mapper.toDto(applicationRepository.save(application));
     }
 }
