@@ -1,19 +1,22 @@
 spring:
   datasource:
-    # Usa las variables que definiste en el docker-compose
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/job_application_db}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
-    driverClassName: org.postgresql.Driver
+    # URL and credentials are dynamically provided by AbstractTestContainers
+    driver-class-name: org.postgresql.Driver
+
   jpa:
     hibernate:
-      # En producción/Docker usamos 'validate' o 'none' porque Flyway gestiona el esquema
       ddl-auto: validate
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+
   flyway:
-    # ¡Importante! Actívalo para que las tablas se creen en Postgres
     enabled: true
     baseline-on-migrate: true
+
+app:
+  jwt:
+    # Ensure HS512 compliance in test environment
+    secret: CIServerTestingSecretKeyForHS512ComplianceAtLeast64CharsLong
+    expiration: 3600

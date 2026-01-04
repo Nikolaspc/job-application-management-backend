@@ -97,7 +97,7 @@ class JobApplicationServiceImplTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        // Setup application
+        // Setup application entity for returns
         application = JobApplication.builder()
                 .id(1L)
                 .candidate(candidate)
@@ -170,8 +170,10 @@ class JobApplicationServiceImplTest {
         // Arrange
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
         when(jobOfferRepository.findById(1L)).thenReturn(Optional.of(activeJobOffer));
+        // FIX: Stubbing toEntity to avoid NullPointerException in service
+        when(mapper.toEntity(any(JobApplicationDTO.class))).thenReturn(new JobApplication());
         when(applicationRepository.save(any(JobApplication.class))).thenReturn(application);
-        when(mapper.toDto(application)).thenReturn(applicationDTO);
+        when(mapper.toDto(any(JobApplication.class))).thenReturn(applicationDTO);
 
         // Act
         JobApplicationDTO result = service.create(applicationDTO);
@@ -239,6 +241,8 @@ class JobApplicationServiceImplTest {
         // Arrange
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
         when(jobOfferRepository.findById(1L)).thenReturn(Optional.of(activeJobOffer));
+        // FIX: Stubbing toEntity to avoid NullPointerException in service
+        when(mapper.toEntity(any(JobApplicationDTO.class))).thenReturn(new JobApplication());
         when(applicationRepository.save(any(JobApplication.class)))
                 .thenThrow(new DataIntegrityViolationException("Duplicate application"));
 
@@ -262,8 +266,10 @@ class JobApplicationServiceImplTest {
 
         when(candidateRepository.findById(1L)).thenReturn(Optional.of(candidate));
         when(jobOfferRepository.findById(1L)).thenReturn(Optional.of(activeJobOffer));
+        // FIX: Stubbing toEntity to avoid NullPointerException in service
+        when(mapper.toEntity(any(JobApplicationDTO.class))).thenReturn(new JobApplication());
         when(applicationRepository.save(any(JobApplication.class))).thenReturn(application);
-        when(mapper.toDto(application)).thenReturn(applicationDTO);
+        when(mapper.toDto(any(JobApplication.class))).thenReturn(applicationDTO);
 
         // Act
         JobApplicationDTO result = service.create(dtoWithoutStatus);

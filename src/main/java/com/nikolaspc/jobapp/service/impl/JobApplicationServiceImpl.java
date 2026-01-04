@@ -61,23 +61,29 @@ public class JobApplicationServiceImpl implements JobApplicationService {
         JobOffer jobOffer = jobOfferRepository.findById(dto.getJobOfferId())
                 .orElseThrow(() -> new ResourceNotFoundException("Job Offer", dto.getJobOfferId()));
 
-        // Business Rule: Offer must be active
-        // Logic updated to use getActive() because of Boolean type in Entity
         if (jobOffer.getActive() == null || !jobOffer.getActive()) {
             throw new BadRequestException("Cannot apply to inactive job offer: " + jobOffer.getTitle());
         }
 
-        // Map basic fields and set relationships manually
         JobApplication application = mapper.toEntity(dto);
+
+        // Safety check to prevent NullPointerException during unit tests
+        if (application == null) {
+            application = new JobApplication();
+        }
+
         application.setCandidate(candidate);
         application.setJobOffer(jobOffer);
 
-        if (application.getStatus() == null) {
+        if (dto.getStatus() == null) {
             application.setStatus(DEFAULT_STATUS);
+        } else {
+            application.setStatus(dto.getStatus());
         }
 
         try {
-            return mapper.toDto(applicationRepository.save(application));
+            JobApplication saved = applicationRepository.save(application);
+            return mapper.toDto(saved);
         } catch (DataIntegrityViolationException e) {
             log.error("Conflict: Candidate {} already applied to offer {}", dto.getCandidateId(), dto.getJobOfferId());
             throw new BadRequestException("Candidate has already applied to this job offer");

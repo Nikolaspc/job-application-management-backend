@@ -22,8 +22,9 @@ jobs:
           cache: 'maven'
 
       - name: Build and Verify
-        # Executes Unit and Integration tests using Maven lifecycle
-        # TestContainers will handle the database setup automatically
-        run: mvn clean verify
+        # -B: Run in non-interactive mode
+        # -ntp: Do not show download progress for cleaner logs
+        run: mvn clean verify -B -ntp
         env:
           APP_JWT_SECRET: CIServerTestingSecretKeyForHS512ComplianceAtLeast64CharsLong
+          SPRING_PROFILES_ACTIVE: test

@@ -4,8 +4,9 @@ import com.nikolaspc.jobapp.domain.JobApplication;
 import com.nikolaspc.jobapp.dto.JobApplicationDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ReportingPolicy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface JobApplicationMapper {
 
     @Mapping(source = "candidate.id", target = "candidateId")
@@ -13,7 +14,7 @@ public interface JobApplicationMapper {
     JobApplicationDTO toDto(JobApplication entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "candidate", ignore = true) // Se asignará manualmente en el Service
-    @Mapping(target = "jobOffer", ignore = true)   // Se asignará manualmente en el Service
+    @Mapping(target = "candidate", ignore = true)
+    @Mapping(target = "jobOffer", ignore = true)
     JobApplication toEntity(JobApplicationDTO dto);
 }

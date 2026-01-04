@@ -1,6 +1,5 @@
 spring:
   datasource:
-    # Uses environment variables if present, otherwise defaults to local postgres
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/job_application_db}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:postgres}
@@ -9,9 +8,9 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none # Security first: Schema is managed by Flyway
+      ddl-auto: none # Managed by Flyway
     show-sql: true
-    open-in-view: false # Prevents N+1 performance issues and stays professional
+    open-in-view: false
     properties:
       hibernate:
         format_sql: true
@@ -21,12 +20,10 @@ spring:
     baseline-on-migrate: true
     repair-on-migrate: true
 
-# Security & Business logic configuration
 app:
   jwt:
-    # Minimum 64 characters for HS512 compliance
     secret: ${APP_JWT_SECRET:ThisIsADefaultSecretKeyForDevelopmentPurposesOnlyAndItIsLongEnoughForHS512}
-    expiration: 86400 # 24 hours in seconds
+    expiration: 86400
 
 server:
   error:
@@ -37,7 +34,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics # Exposes Actuator endpoints for monitoring
+        include: health, info, metrics
 
 logging:
   level:
