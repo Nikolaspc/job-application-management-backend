@@ -1,113 +1,332 @@
 # Job Application Management Backend
 
-Professional Spring Boot 3.4 REST API for recruitment management. Built with a "Security-First" approach and Production-Ready standards for the German tech market.
+Professional Spring Boot 3.4 REST API for enterprise recruitment management. Built with **Security-First** principles and **Production-Ready** standards aligned with international tech market requirements.
 
-![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.1-brightgreen?logo=spring)
-![Security](https://img.shields.io/badge/Security-JWT-blueviolet)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue)
+[![Java](https://img.shields.io/badge/Java-17%2B-orange.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4-green.svg)](https://spring.io/projects/spring-boot)
+[![Spring Security](https://img.shields.io/badge/Spring%20Security-6-blue.svg)](https://spring.io/projects/spring-security)
+[![JWT](https://img.shields.io/badge/JWT-HS512-red.svg)](https://jwt.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14%2B-336791.svg)](https://www.postgresql.org/)
+[![Maven](https://img.shields.io/badge/Maven-3.8%2B-C71A36.svg)](https://maven.apache.org/)
+[![Docker](https://img.shields.io/badge/Docker-Supported-2496ED.svg)](https://www.docker.com/)
+[![GitHub Actions](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-2088FF.svg)](https://github.com/features/actions)
+[![Build Status](https://github.com/Nikolaspc/job-application-management-backend/actions/workflows/maven.yml/badge.svg)](https://github.com/Nikolaspc/job-application-management-backend/actions/workflows/maven.yml)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Project Overview
+---
 
-This backend system manages the complete lifecycle of job recruitment: Job Offers, Candidate Profiles, and Applications. It focuses on technical excellence using a strictly layered architecture and modern industry patterns.
+## 📋 Table of Contents
 
-### German Market Standards Applied
+- [Overview](#overview)
+- [Technical Architecture](#technical-architecture)
+- [Technology Stack](#technology-stack)
+- [Installation & Setup](#installation--setup)
+- [Authentication & Authorization](#authentication--authorization)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Author](#author)
 
-- **Stateless Authentication**: Fully implemented JWT with secure expiration and role-based access control
-- **Data Integrity**: Database migrations via Flyway (no `ddl-auto: update` in production)
-- **Quality Assurance**: Automated CI pipeline via GitHub Actions
-- **Clean Code**: Strict separation of concerns using DTOs vs Entities with MapStruct
+---
 
-## Tech Stack & Patterns
+## Overview
 
-| Category | Technology |
-|----------|-----------|
-| Core | Java 17, Spring Boot 3.4.1 |
-| Data | PostgreSQL, Spring Data JPA, Hibernate, Flyway |
-| Security | Spring Security 6, JWT (JJWT), BCrypt (Strength 12) |
-| Mapping | MapStruct 1.5.5 |
-| Documentation | OpenAPI 3 / Swagger UI |
-| DevOps | Docker, GitHub Actions |
+This backend system provides a comprehensive solution for managing the complete recruitment lifecycle:
 
-## Architecture Design
+- **Job Offers Management** — Create, update, and manage job postings
+- **Candidate Profiles** — Maintain detailed candidate information and qualifications
+- **Application Tracking** — Process and track job applications through the pipeline
 
-The project follows a Strict Layered Architecture to ensure maintainability and testability:
+The architecture emphasizes **technical excellence**, **security compliance**, and **scalability** using industry-standard patterns and proven technologies.
 
-1. **Controller Layer**: Handles HTTP requests, JSR-303 validation, and response wrapping
-2. **Service Layer**: Encapsulates business logic and transactional boundaries
-3. **Repository Layer**: Spring Data JPA interfaces for optimized database access
-4. **Domain Layer**: Pure JPA entities representing the relational schema
-5. **DTO Layer**: Decouples internal logic from external API contracts
+---
 
-## Getting Started
+## Technical Architecture
+
+### Design Principles
+
+**Stateless Security with JWT HS512**  
+Implemented stateless authentication using JSON Web Tokens signed with HS512. This algorithm requires a minimum 64-character key, ensuring higher entropy and resistance to brute-force attacks compared to HS256. Perfect for horizontal scalability in distributed environments.
+
+**Database Versioning with Flyway**  
+Production stability is maintained through explicit schema versioning. The `ddl-auto` setting is disabled in favor of Flyway migrations, ensuring reproducible database state across all environments and enabling safe rollbacks.
+
+**API Decoupling via DTOs & MapStruct**  
+Entities are strictly isolated from the API layer through Data Transfer Objects. MapStruct provides compile-time type-safe mapping, eliminating runtime reflection overhead and ensuring consistency across transformations.
+
+**Quality Assurance with Testcontainers**  
+Integration tests execute against real PostgreSQL instances running in Docker, guaranteeing development-production parity and catching environment-specific issues early.
+
+### Layered Architecture
+
+```
+┌─────────────────────────────────────┐
+│      Controller Layer (REST)        │
+├─────────────────────────────────────┤
+│      Service Layer (Business Logic) │
+├─────────────────────────────────────┤
+│      Repository Layer (Data Access) │
+├─────────────────────────────────────┤
+│    Database Layer (PostgreSQL)      │
+└─────────────────────────────────────┘
+```
+
+---
+
+## Technology Stack
+
+| Category | Technology | Version |
+|:---------|:-----------|:--------|
+| **Runtime** | Java | 17+ |
+| **Framework** | Spring Boot | 3.4.1 |
+| **Database** | PostgreSQL | 14+ |
+| **ORM** | Spring Data JPA | - |
+| **Migrations** | Flyway | - |
+| **Security** | Spring Security 6 | - |
+| **Auth Token** | JJWT | - |
+| **Password Hashing** | BCrypt | Strength 12 |
+| **Mapping** | MapStruct | 1.5.5+ |
+| **Utilities** | Lombok | - |
+| **Documentation** | OpenAPI 3 / Swagger UI | - |
+| **Testing** | Testcontainers | - |
+| **Build** | Maven | 3.8+ |
+| **CI/CD** | GitHub Actions | - |
+| **Containerization** | Docker | - |
+
+---
+
+## Installation & Setup
 
 ### Prerequisites
 
-- Java 17 or higher
-- PostgreSQL 14/15/16
-- Maven 3.8 or higher
+- **Java 17** or higher
+- **Maven 3.8+**
+- **PostgreSQL 14+** (local or Docker)
+- **Docker** (optional, recommended)
 
-### Database Setup
+### Option 1: Manual Setup (Local Database)
 
-Create the database in your local PostgreSQL instance:
+#### 1. Create Database
 
-```bash
-psql -c "CREATE DATABASE job_application_db;"
+```sql
+CREATE DATABASE job_application_db;
+-- Default user: postgres
+-- Default password: postgres
 ```
 
-### Configuration
-
-The application uses `src/main/resources/application.yml`. Flyway will automatically execute migrations located in `src/main/resources/db/migration/`.
-
-### Run Application
+#### 2. Configure Environment Variables
 
 ```bash
-./mvnw clean spring-boot:run
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/job_application_db
+export SPRING_DATASOURCE_USERNAME=postgres
+export SPRING_DATASOURCE_PASSWORD=postgres
+export APP_JWT_SECRET=YourSecretKeyWithAtLeast64CharactersForHS512SigningAlgorithm
+export SPRING_PROFILES_ACTIVE=dev
 ```
 
-The API starts at: `http://localhost:8080`
+Alternatively, edit `src/main/resources/application.yml` directly.
 
-## Security & Access Matrix
+#### 3. Build & Run
 
-All passwords are encrypted using BCrypt. Authentication is stateless via JWT Bearer Tokens.
+```bash
+./mvnw clean install
+./mvnw spring-boot:run
+```
 
-| Role | Job Offers (GET) | Job Offers (POST/PUT) | Applications (POST) | Admin Panel |
-|------|:----------------:|:--------------------:|:-------------------:|:-----------:|
-| GUEST | ✓ | ✗ | ✗ | ✗ |
-| CANDIDATE | ✓ | ✗ | ✓ | ✗ |
-| RECRUITER | ✓ | ✓ | ✓ | ✗ |
-| ADMIN | ✓ | ✓ | ✓ | ✓ |
+The application starts on `http://localhost:8080`
 
-### Default Credentials (Testing Only)
+---
 
-- **Admin**: admin@example.com / admin123
-- **Candidate**: candidate@example.com / candidate123
+### Option 2: Docker Setup (Recommended)
+
+```bash
+docker compose up -d
+```
+
+This command orchestrates:
+- PostgreSQL database
+- Application container
+- Network configuration
+
+Verify the application is running:
+
+```bash
+curl -X GET http://localhost:8080/health
+```
+
+---
+
+## Authentication & Authorization
+
+### JWT Authentication Flow
+
+The API uses **Bearer Token** authentication. All protected endpoints require a valid JWT in the `Authorization` header.
+
+#### Step 1: Register Account
+
+Create a new user account with one of three roles: `CANDIDATE`, `RECRUITER`, or `ADMIN`.
+
+```bash
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Nikolas",
+  "lastName": "Perez",
+  "email": "candidate@example.com",
+  "password": "SecurePassword123!",
+  "role": "CANDIDATE"
+}
+```
+
+Response:
+```json
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "email": "candidate@example.com",
+  "role": "CANDIDATE",
+  "createdAt": "2025-01-04T10:30:00Z"
+}
+```
+
+#### Step 2: Obtain Access Token
+
+```bash
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "candidate@example.com",
+  "password": "SecurePassword123!"
+}
+```
+
+Response:
+```json
+{
+  "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjYW5kaWRhdGVAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzMyMzQyMDB9...",
+  "type": "Bearer",
+  "expiresIn": 3600
+}
+```
+
+#### Step 3: Use Token in Requests
+
+```bash
+GET /api/candidates/profile
+Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjYW5kaWRhdGVAZXhhbXBsZS5jb20i...
+```
+
+---
+
+### Access Control Matrix
+
+| Role | Job Offers (GET) | Job Offers (POST) | Applications (POST) | Admin Panel |
+|:-----|:----------------:|:----------------:|:-------------------:|:-----------:|
+| **GUEST** | ✅ | ❌ | ❌ | ❌ |
+| **CANDIDATE** | ✅ | ❌ | ✅ | ❌ |
+| **RECRUITER** | ✅ | ✅ | ✅ | ❌ |
+| **ADMIN** | ✅ | ✅ | ✅ | ✅ |
+
+---
 
 ## API Documentation
 
-Once the application is running, access the interactive Swagger UI at: `http://localhost:8080/swagger-ui.html`
+Once the application is running, access the interactive API documentation:
 
-## CI/CD Pipeline
+**📖 Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-The project includes a `.github/workflows/maven.yml` file that triggers on every push and pull request:
+**📄 OpenAPI JSON:** [http://localhost:8080/v3/api-docs](http://localhost:8080/v3/api-docs)
 
-- **Build**: Verifies Java 17 compilation
-- **Test**: Executes unit and integration tests
-- **Verify**: Checks code quality and dependencies
+---
 
-## Technical Decisions
+## Project Structure
 
-**MapStruct**: Generates boilerplate-free, type-safe mapping code at compile time, outperforming reflection-based mappers like ModelMapper.
+```
+job-application-management-backend/
+├── src/main/java/com/nikolaspc/
+│   ├── controller/          # REST endpoints
+│   ├── service/             # Business logic
+│   ├── repository/          # Data access (JPA)
+│   ├── entity/              # JPA entities
+│   ├── dto/                 # Data transfer objects
+│   ├── mapper/              # MapStruct mappers
+│   ├── security/            # JWT & Auth config
+│   ├── config/              # Spring configuration
+│   └── exception/           # Custom exceptions
+├── src/main/resources/
+│   ├── application.yml      # Main configuration
+│   ├── application-dev.yml  # Development profile
+│   ├── application-prod.yml # Production profile
+│   └── db/migration/        # Flyway migrations
+├── src/test/java/           # Unit & integration tests
+├── docker-compose.yml       # Docker orchestration
+├── pom.xml                  # Maven configuration
+└── README.md                # This file
+```
 
-**Flyway**: In production environments, manual database changes pose significant risk. Flyway ensures the schema is versioned and reproducible across all deployment environments.
+---
 
-**JWT**: Enables the backend to remain stateless and scalable, facilitating seamless deployment in containerized environments such as Kubernetes.
+## Development Workflows
 
-**FetchType.LAZY**: Used in `@ManyToOne` relationships to prevent N+1 query problems and unnecessary data loading.
+### Running Tests
+
+```bash
+# Unit tests only
+./mvnw test
+
+# Integration tests (requires Docker)
+./mvnw verify
+
+# With coverage report
+./mvnw clean test jacoco:report
+```
+
+### Code Quality
+
+```bash
+# Format code
+./mvnw spotless:apply
+
+# Static analysis
+./mvnw checkstyle:check pmd:check
+```
+
+---
+
+## Contributing
+
+Contributions are welcome. Please ensure:
+
+1. Code follows the project's style guidelines
+2. All tests pass: `./mvnw clean verify`
+3. New features include tests
+4. Commit messages are descriptive
+
+---
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
+
+---
 
 ## Author
 
 **Nikolas Pérez Cvjetkovic**  
-Computer Science Student  
-Based in: Germany  
-Email: n.perez.cvjetkovic@gmail.com
+Software Developer | Based in Germany 🇩🇪
+
+📧 [n.perez.cvjetkovic@gmail.com](mailto:n.perez.cvjetkovic@gmail.com)  
+💼 [LinkedIn](https://linkedin.com) | 🐙 [GitHub](https://github.com/Nikolaspc)
+
+---
+
+## Support
+
+For issues, feature requests, or questions:
+
+- 🐛 [Open an Issue](https://github.com/Nikolaspc/job-application-management-backend/issues)
+- 💬 [Start a Discussion](https://github.com/Nikolaspc/job-application-management-backend/discussions)
+
+---
+
