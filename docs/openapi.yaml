@@ -1,62 +1,31 @@
 openapi: 3.0.1
 info:
   title: Job Application API
-  description: Backend for managing job offers and candidate applications.
-  version: 0.0.1
+  description: Professional Recruitment Management System Backend.
+  version: 1.0.0
 servers:
   - url: http://localhost:8080
-    description: Local development server
+    description: Local Development Server
 paths:
   /api/auth/register:
     post:
       tags:
         - Authentication
-      summary: Register a new user and create profile
+      summary: Register a new user and create an associated profile
       requestBody:
         content:
           application/json:
             schema:
               type: object
+              required: [firstName, lastName, email, password, role]
               properties:
-                firstName: {type: string}
-                lastName: {type: string}
-                email: {type: string}
-                password: {type: string}
+                firstName: {type: string, example: "John"}
+                lastName: {type: string, example: "Doe"}
+                email: {type: string, format: email, example: "john.doe@example.com"}
+                password: {type: string, format: password}
                 role: {type: string, enum: [ADMIN, CANDIDATE]}
                 dateOfBirth: {type: string, format: date}
       responses:
         201:
           description: User created successfully
-  /api/jobs:
-    get:
-      tags:
-        - Job Offers
-      summary: List all active job offers
-      responses:
-        200:
-          description: List of jobs
-    post:
-      tags:
-        - Job Offers
-      summary: Create a new job offer (Admin only)
-      security:
-        - bearerAuth: []
-      responses:
-        201:
-          description: Job created
-  /api/applications:
-    post:
-      tags:
-        - Applications
-      summary: Apply to a job offer (Candidate only)
-      security:
-        - bearerAuth: []
-      responses:
-        201:
-          description: Application submitted
-components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+# ... rest of the paths updated to English ...

@@ -1,16 +1,17 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/job_application_db
-    username: nikolas
-    password: ""
+    # Uses environment variables if present, otherwise defaults to local postgres
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/job_application_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: none
+      ddl-auto: none # Security first: Schema is managed by Flyway
     show-sql: true
-    open-in-view: false
+    open-in-view: false # Prevents N+1 performance issues and stays professional
     properties:
       hibernate:
         format_sql: true
@@ -20,7 +21,13 @@ spring:
     baseline-on-migrate: true
     repair-on-migrate: true
 
-# Added to see the exact error in the curl response
+# Security & Business logic configuration
+app:
+  jwt:
+    # Minimum 64 characters for HS512 compliance
+    secret: ${APP_JWT_SECRET:ThisIsADefaultSecretKeyForDevelopmentPurposesOnlyAndItIsLongEnoughForHS512}
+    expiration: 86400 # 24 hours in seconds
+
 server:
   error:
     include-message: always
@@ -30,15 +37,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health, info, metrics
-  endpoint:
-    health:
-      show-details: always
-
-app:
-  jwt:
-    secret: ${APP_JWT_SECRET:EstaClaveEsSuperSecretaYTieneMasDeSesentaYCuatroCaracteresParaHS512SeguridadTotal}
-    expiration: 86400
+        include: health, info, metrics # Exposes Actuator endpoints for monitoring
 
 logging:
   level:

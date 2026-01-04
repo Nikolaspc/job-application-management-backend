@@ -20,10 +20,11 @@ services:
     ports:
       - "8080:8080"
     environment:
+      # Injecting environment variables into the Spring Boot container
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/job_application_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      APP_JWT_SECRET: EstaClaveEsSuperSecretaYTieneMasDeSesentaYCuatroCaracteresParaHS512SeguridadTotal
+      APP_JWT_SECRET: ${APP_JWT_SECRET:-ProductionReadySecretKeyMustBeSetInEnvironmentVariables}
     depends_on:
       postgres-db:
         condition: service_healthy
