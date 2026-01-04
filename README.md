@@ -15,54 +15,54 @@ Professional Spring Boot 3.4 REST API for enterprise recruitment management. Bui
 
 ---
 
-## 📋 Inhaltsverzeichnis
+## 📋 Table of Contents
 
-- [Überblick](#überblick)
-- [Technische Architektur](#technische-architektur)
-- [Technologie-Stack](#technologie-stack)
+- [Overview](#overview)
+- [Technical Architecture](#technical-architecture)
+- [Technology Stack](#technology-stack)
 - [Installation & Setup](#installation--setup)
-- [Authentifizierung & Autorisierung](#authentifizierung--autorisierung)
-- [API-Dokumentation](#api-dokumentation)
-- [Projektstruktur](#projektstruktur)
-- [Datenbank-Schema](#datenbank-schema)
-- [Konfiguration](#konfiguration)
+- [Authentication & Authorization](#authentication--authorization)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Database Schema](#database-schema)
+- [Configuration](#configuration)
 - [Deployment](#deployment)
-- [Fehlerbehebung](#fehlerbehebung)
+- [Troubleshooting](#troubleshooting)
 - [Best Practices](#best-practices)
-- [Mitwirkende](#mitwirkende)
-- [Autor](#autor)
+- [Contributing](#contributing)
+- [Author](#author)
 
 ---
 
-## Überblick
+## Overview
 
-Dieses Backend-System bietet eine umfassende Lösung für die Verwaltung des kompletten Rekrutierungszyklus:
+This backend system provides a comprehensive solution for managing the complete recruitment lifecycle:
 
-- **Job-Angebote-Management** — Erstellen, aktualisieren und verwalten Sie Stellenausschreibungen
-- **Kandidaten-Profile** — Verwalten Sie detaillierte Kandidateninformationen und Qualifikationen
-- **Bewerbungs-Tracking** — Verfolgen Sie Bewerbungen durch den gesamten Prozess
+- **Job Offers Management** — Create, update, and manage job postings
+- **Candidate Profiles** — Maintain detailed candidate information and qualifications
+- **Application Tracking** — Process and track job applications through the pipeline
 
-Die Architektur betont **technische Exzellenz**, **Sicherheitskonformität** und **Skalierbarkeit** unter Verwendung bewährter Industriemuster und moderner Technologien.
+The architecture emphasizes **technical excellence**, **security compliance**, and **scalability** using industry-standard patterns and proven technologies.
 
 ---
 
-## Technische Architektur
+## Technical Architecture
 
-### Design-Prinzipien
+### Design Principles
 
-**Zustandslose Sicherheit mit JWT HS512**  
-Implementierte zustandslose Authentifizierung mit JSON Web Tokens, signiert mit HS512. Dieser Algorithmus erfordert einen Mindesschlüssel von 64 Zeichen und bietet höhere Entropie und Widerstandsfähigkeit gegen Brute-Force-Angriffe im Vergleich zu HS256. Perfekt für horizontale Skalierbarkeit in verteilten Umgebungen.
+**Stateless Security with JWT HS512**  
+Implemented stateless authentication using JSON Web Tokens signed with HS512. This algorithm requires a minimum 64-character key, ensuring higher entropy and resistance to brute-force attacks compared to HS256. Perfect for horizontal scalability in distributed environments.
 
-**Datenbank-Versionierung mit Flyway**  
-Produktionsstabilität wird durch explizite Schema-Versionierung gewährleistet. Die `ddl-auto`-Einstellung ist deaktiviert zugunsten von Flyway-Migrationen, was einen reproduzierbaren Datenbankzustand über alle Umgebungen hinweg sicherstellt und sichere Rollbacks ermöglicht.
+**Database Versioning with Flyway**  
+Production stability is maintained through explicit schema versioning. The `ddl-auto` setting is disabled in favor of Flyway migrations, ensuring reproducible database state across all environments and enabling safe rollbacks.
 
-**API-Entkopplung via DTOs & MapStruct**  
-Entitäten sind streng von der API-Schicht durch Datenübertragungsobjekte isoliert. MapStruct bietet typsichere Compile-Zeit-Mapping, eliminiert Runtime-Reflection-Overhead und stellt Konsistenz in Transformationen sicher.
+**API Decoupling via DTOs & MapStruct**  
+Entities are strictly isolated from the API layer through Data Transfer Objects. MapStruct provides compile-time type-safe mapping, eliminating runtime reflection overhead and ensuring consistency across transformations.
 
-**Qualitätssicherung mit Testcontainers**  
-Integrationstests werden gegen echte PostgreSQL-Instanzen in Docker ausgeführt, was Development-Production Parity garantiert und umgebungsspezifische Probleme frühzeitig erkennt.
+**Quality Assurance with Testcontainers**  
+Integration tests execute against real PostgreSQL instances running in Docker, guaranteeing development-production parity and catching environment-specific issues early.
 
-### Geschichtete Architektur
+### Layered Architecture
 
 ```
 ┌─────────────────────────────────────┐
@@ -78,48 +78,48 @@ Integrationstests werden gegen echte PostgreSQL-Instanzen in Docker ausgeführt,
 
 ---
 
-## Technologie-Stack
+## Technology Stack
 
-| Kategorie | Technologie | Version |
-|:----------|:-----------|:--------|
+| Category | Technology | Version |
+|:---------|:-----------|:--------|
 | **Runtime** | Java | 17+ |
 | **Framework** | Spring Boot | 3.4.1 |
-| **Datenbank** | PostgreSQL | 14+ |
+| **Database** | PostgreSQL | 14+ |
 | **ORM** | Spring Data JPA | — |
-| **Migrationen** | Flyway | — |
-| **Sicherheit** | Spring Security 6 | — |
+| **Migrations** | Flyway | — |
+| **Security** | Spring Security 6 | — |
 | **Auth Token** | JJWT | — |
 | **Password Hashing** | BCrypt | Strength 12 |
 | **Mapping** | MapStruct | 1.5.5+ |
 | **Utilities** | Lombok | — |
-| **Dokumentation** | OpenAPI 3 / Swagger UI | — |
+| **Documentation** | OpenAPI 3 / Swagger UI | — |
 | **Testing** | Testcontainers | — |
 | **Build** | Maven | 3.8+ |
 | **CI/CD** | GitHub Actions | — |
-| **Containerisierung** | Docker | — |
+| **Containerization** | Docker | — |
 
 ---
 
 ## Installation & Setup
 
-### Voraussetzungen
+### Prerequisites
 
-- **Java 17** oder höher
+- **Java 17** or higher
 - **Maven 3.8+**
-- **PostgreSQL 14+** (lokal oder Docker)
-- **Docker** (optional, empfohlen)
+- **PostgreSQL 14+** (local or Docker)
+- **Docker** (optional, recommended)
 
-### Option 1: Manuelle Einrichtung (Lokale Datenbank)
+### Option 1: Manual Setup (Local Database)
 
-#### 1. Datenbank erstellen
+#### 1. Create Database
 
 ```sql
 CREATE DATABASE job_application_db;
--- Standard-Benutzer: postgres
--- Standard-Passwort: postgres
+-- Default user: postgres
+-- Default password: postgres
 ```
 
-#### 2. Umgebungsvariablen konfigurieren
+#### 2. Configure Environment Variables
 
 ```bash
 export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/job_application_db
@@ -129,31 +129,31 @@ export APP_JWT_SECRET=YourSecretKeyWithAtLeast64CharactersForHS512SigningAlgorit
 export SPRING_PROFILES_ACTIVE=dev
 ```
 
-Alternativ können Sie `src/main/resources/application.yml` direkt bearbeiten.
+Alternatively, edit `src/main/resources/application.yml` directly.
 
-#### 3. Bauen & Ausführen
+#### 3. Build & Run
 
 ```bash
 ./mvnw clean install
 ./mvnw spring-boot:run
 ```
 
-Die Anwendung startet auf `http://localhost:8080`
+The application starts on `http://localhost:8080`
 
 ---
 
-### Option 2: Docker Setup (Empfohlen)
+### Option 2: Docker Setup (Recommended)
 
 ```bash
 docker compose up -d
 ```
 
-Dieser Befehl orchestriert:
-- PostgreSQL-Datenbank
-- Anwendungs-Container
-- Netzwerk-Konfiguration
+This command orchestrates:
+- PostgreSQL database
+- Application container
+- Network configuration
 
-Überprüfen Sie, dass die Anwendung läuft:
+Verify the application is running:
 
 ```bash
 curl -X GET http://localhost:8080/health
@@ -161,15 +161,15 @@ curl -X GET http://localhost:8080/health
 
 ---
 
-## Authentifizierung & Autorisierung
+## Authentication & Authorization
 
-### JWT-Authentifizierungs-Workflow
+### JWT Authentication Flow
 
-Die API verwendet **Bearer Token**-Authentifizierung. Alle geschützten Endpunkte erfordern ein gültiges JWT im `Authorization`-Header.
+The API uses **Bearer Token** authentication. All protected endpoints require a valid JWT in the `Authorization` header.
 
-#### Schritt 1: Konto registrieren
+#### Step 1: Register Account
 
-Erstellen Sie ein neues Benutzerkonto mit einer von drei Rollen: `CANDIDATE`, `RECRUITER` oder `ADMIN`.
+Create a new user account with one of three roles: `CANDIDATE`, `RECRUITER`, or `ADMIN`.
 
 ```bash
 POST /api/auth/register
@@ -184,7 +184,7 @@ Content-Type: application/json
 }
 ```
 
-Antwort:
+Response:
 ```json
 {
   "id": "550e8400-e29b-41d4-a716-446655440000",
@@ -194,7 +194,7 @@ Antwort:
 }
 ```
 
-#### Schritt 2: Zugangstoken abrufen
+#### Step 2: Obtain Access Token
 
 ```bash
 POST /api/auth/login
@@ -206,7 +206,7 @@ Content-Type: application/json
 }
 ```
 
-Antwort:
+Response:
 ```json
 {
   "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjYW5kaWRhdGVAZXhhbXBsZS5jb20iLCJpYXQiOjE2NzMyMzQyMDB9...",
@@ -215,7 +215,7 @@ Antwort:
 }
 ```
 
-#### Schritt 3: Token in Anfragen verwenden
+#### Step 3: Use Token in Requests
 
 ```bash
 GET /api/candidates/profile
@@ -224,20 +224,20 @@ Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjYW5kaWRhdGVAZXhhbXBsZS5jb
 
 ---
 
-### Zugriffskontroll-Matrix
+### Access Control Matrix
 
-| Rolle | Job-Angebote (GET) | Job-Angebote (POST) | Bewerbungen (POST) | Admin-Panel |
+| Role | Job Offers (GET) | Job Offers (POST) | Applications (POST) | Admin Panel |
 |:-----|:----------------:|:----------------:|:-------------------:|:-----------:|
-| **GAST** | ✅ | ❌ | ❌ | ❌ |
-| **KANDIDAT** | ✅ | ❌ | ✅ | ❌ |
+| **GUEST** | ✅ | ❌ | ❌ | ❌ |
+| **CANDIDATE** | ✅ | ❌ | ✅ | ❌ |
 | **RECRUITER** | ✅ | ✅ | ✅ | ❌ |
 | **ADMIN** | ✅ | ✅ | ✅ | ✅ |
 
 ---
 
-## API-Dokumentation
+## API Documentation
 
-Sobald die Anwendung läuft, greifen Sie auf die interaktive API-Dokumentation zu:
+Once the application is running, access the interactive API documentation:
 
 **📖 Swagger UI:** [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
@@ -245,7 +245,7 @@ Sobald die Anwendung läuft, greifen Sie auf die interaktive API-Dokumentation z
 
 ---
 
-## Projektstruktur
+## Project Structure
 
 ```
 job-application-management-backend/
@@ -253,21 +253,21 @@ job-application-management-backend/
 │   ├── main/
 │   │   ├── java/com/nikolaspc/jobapp/
 │   │   │   ├── config/
-│   │   │   │   ├── MapperConfig.java           # MapStruct Konfiguration
-│   │   │   │   ├── OpenApiConfig.java          # Swagger/OpenAPI Setup
+│   │   │   │   ├── MapperConfig.java           # MapStruct configuration
+│   │   │   │   ├── OpenApiConfig.java          # Swagger/OpenAPI setup
 │   │   │   │   └── SecurityConfig.java         # Spring Security & CORS
 │   │   │   │
 │   │   │   ├── controller/
-│   │   │   │   ├── AuthController.java         # Login & Register Endpunkte
-│   │   │   │   ├── CandidateController.java    # Kandidaten CRUD
+│   │   │   │   ├── AuthController.java         # Login & Register endpoints
+│   │   │   │   ├── CandidateController.java    # Candidate CRUD
 │   │   │   │   ├── JobApplicationController.java
 │   │   │   │   └── JobOfferController.java     # Job CRUD
 │   │   │   │
 │   │   │   ├── domain/
-│   │   │   │   ├── User.java                   # Basis-User-Entity
-│   │   │   │   ├── Candidate.java              # Kandidaten-Profil
-│   │   │   │   ├── JobOffer.java               # Job-Angebot-Entity
-│   │   │   │   ├── JobApplication.java         # Bewerbungs-Tracking
+│   │   │   │   ├── User.java                   # Base user entity
+│   │   │   │   ├── Candidate.java              # Candidate profile
+│   │   │   │   ├── JobOffer.java               # Job listing entity
+│   │   │   │   ├── JobApplication.java         # Application tracking
 │   │   │   │   └── UserRole.java               # Enum: ADMIN, RECRUITER, CANDIDATE
 │   │   │   │
 │   │   │   ├── dto/
@@ -275,42 +275,42 @@ job-application-management-backend/
 │   │   │   │   │   ├── JobOfferRequestDTO.java
 │   │   │   │   │   └── JobOfferResponseDTO.java
 │   │   │   │   ├── AuthRequest.java
-│   │   │   │   ├── AuthResponse.java           # JWT Antwort
+│   │   │   │   ├── AuthResponse.java           # JWT response
 │   │   │   │   ├── CandidateDTO.java
 │   │   │   │   ├── JobApplicationDTO.java
 │   │   │   │   ├── RegisterRequest.java
 │   │   │   │   └── UserDto.java
 │   │   │   │
 │   │   │   ├── exception/
-│   │   │   │   ├── ApiError.java               # Error Record Format
-│   │   │   │   ├── ApiException.java           # Basis-Exception
-│   │   │   │   ├── BadRequestException.java    # 400 Fehler
-│   │   │   │   ├── JwtException.java           # JWT Validierungsfehler
+│   │   │   │   ├── ApiError.java               # Error record format
+│   │   │   │   ├── ApiException.java           # Base exception
+│   │   │   │   ├── BadRequestException.java    # 400 errors
+│   │   │   │   ├── JwtException.java           # JWT validation errors
 │   │   │   │   ├── ResourceNotFoundException.java
 │   │   │   │   ├── UserAlreadyExistsException.java
-│   │   │   │   ├── ErrorResponse.java          # Error Response Format
+│   │   │   │   ├── ErrorResponse.java          # Error response format
 │   │   │   │   └── GlobalExceptionHandler.java # @RestControllerAdvice
 │   │   │   │
 │   │   │   ├── mapper/
-│   │   │   │   ├── CandidateMapper.java        # MapStruct Interface
+│   │   │   │   ├── CandidateMapper.java        # MapStruct interface
 │   │   │   │   ├── JobApplicationMapper.java
-│   │   │   │   └── JobOfferMapper.java         # Auto Mapping Entity ↔ DTO
+│   │   │   │   └── JobOfferMapper.java         # Auto mapping Entity ↔ DTO
 │   │   │   │
 │   │   │   ├── repository/
 │   │   │   │   ├── UserRepository.java         # findByEmail, existsByEmail
-│   │   │   │   ├── CandidateRepository.java    # Benutzerdefinierte Abfragen
+│   │   │   │   ├── CandidateRepository.java    # Custom query methods
 │   │   │   │   ├── JobOfferRepository.java     # findByActiveTrue()
 │   │   │   │   └── JobApplicationRepository.java
 │   │   │   │
 │   │   │   ├── security/
-│   │   │   │   ├── JwtTokenProvider.java       # Token-Generierung & Validierung (HS512)
-│   │   │   │   ├── JwtAuthenticationFilter.java # Request-Interceptor
-│   │   │   │   ├── JwtAuthenticationEntryPoint.java # 401 Handler
-│   │   │   │   └── JwtUserDetails.java         # Token Payload Holder
+│   │   │   │   ├── JwtTokenProvider.java       # Token generation & validation (HS512)
+│   │   │   │   ├── JwtAuthenticationFilter.java # Request interceptor
+│   │   │   │   ├── JwtAuthenticationEntryPoint.java # 401 handler
+│   │   │   │   └── JwtUserDetails.java         # Token payload holder
 │   │   │   │
 │   │   │   ├── service/
-│   │   │   │   ├── AuthService.java            # Register & Login Logik
-│   │   │   │   ├── CandidateService.java       # CRUD Interface
+│   │   │   │   ├── AuthService.java            # Register & Login logic
+│   │   │   │   ├── CandidateService.java       # CRUD interface
 │   │   │   │   ├── JobApplicationService.java
 │   │   │   │   ├── JobOfferService.java
 │   │   │   │   └── impl/
@@ -318,13 +318,13 @@ job-application-management-backend/
 │   │   │   │       ├── JobApplicationServiceImpl.java
 │   │   │   │       └── JobOfferServiceImpl.java
 │   │   │   │
-│   │   │   └── JobApplicationBackendApplication.java # @SpringBootApplication
+│   │   │   └── JobApplicationBackendApplication.java # @SpringBootApplication entry
 │   │   │
 │   │   └── resources/
-│   │       ├── application.yml                 # Haupt-Konfiguration
-│   │       ├── application-dev.yml             # Development Einstellungen
-│   │       ├── application-prod.yml            # Production Einstellungen
-│   │       └── db/migration/                   # Flyway SQL Migrationen
+│   │       ├── application.yml                 # Main config
+│   │       ├── application-dev.yml             # Development settings
+│   │       ├── application-prod.yml            # Production settings
+│   │       └── db/migration/                   # Flyway SQL migrations
 │   │
 │   └── test/
 │       └── java/com/nikolaspc/jobapp/
@@ -345,54 +345,54 @@ job-application-management-backend/
 │           │
 │           ├── service/
 │           │   ├── CandidateServiceImplTest.java
-│           │   ├── JobApplicationServiceImplTest.java (15+ Test-Cases)
+│           │   ├── JobApplicationServiceImplTest.java (15+ test cases)
 │           │   └── JobOfferServiceImplTest.java
 │           │
-│           └── AbstractTestContainers.java     # Basis-Klasse für IT Tests
+│           └── AbstractTestContainers.java     # Base class for IT tests
 │
-├── docker-compose.yml                          # PostgreSQL + App Orchestration
-├── pom.xml                                      # Maven Konfig
+├── docker-compose.yml                          # PostgreSQL + App orchestration
+├── pom.xml                                      # Maven build config
 ├── .gitignore
-├── README.md                                    # Diese Datei
+├── README.md                                    # This file
 └── .github/
     └── workflows/
-        └── maven.yml                           # CI/CD Pipeline
+        └── maven.yml                           # CI/CD pipeline
 ```
 
-### Schicht-Verantwortlichkeiten
+### Layer Responsibilities
 
-**Controller-Schicht**
-- Behandelt HTTP-Anfragen/Antworten
-- Validiert Eingabe mit `@Valid`
-- Delegiert an Services
-- Gibt angemessene HTTP-Statuscodes zurück
+**Controller Layer**
+- Handles HTTP requests/responses
+- Validates input with `@Valid`
+- Delegates to Services
+- Returns appropriate HTTP status codes
 
-**Service-Schicht**
-- Business-Logik & Validierung
-- Transaktionsverwaltung (`@Transactional`)
-- Fehlerbehandlung
-- Integration zwischen Repositories
+**Service Layer**
+- Business logic & validation
+- Transaction management (`@Transactional`)
+- Exception handling
+- Integration between repositories
 
-**Repository-Schicht**
-- Spring Data JPA Interfaces
-- Datenbankabfragen (auto-implementiert oder benutzerdefiniert)
-- Beispiel: `findByEmail()`, `findByActiveTrue()`
+**Repository Layer**
+- Spring Data JPA interfaces
+- Database queries (auto-implemented or custom)
+- Example: `findByEmail()`, `findByActiveTrue()`
 
-**Ausnahmeverarbeitung**
-- Zentralisiert via `GlobalExceptionHandler`
-- Benutzerdefinierte Exceptions für spezifische Szenarios
-- Konsistentes Error Response Format
+**Exception Handling**
+- Centralized via `GlobalExceptionHandler`
+- Custom exceptions for specific scenarios
+- Consistent error response format
 
-**Sicherheit**
-- JWT HS512 Token-Generierung
-- Zustandslose Authentifizierungs-Filter
-- Rollenbasierte Zugriffskontrolle
+**Security**
+- JWT HS512 token generation
+- Stateless authentication filter
+- Role-based access control
 
 ---
 
-## Datenbank-Schema
+## Database Schema
 
-### Kern-Tabellen
+### Core Tables
 
 **users**
 ```sql
@@ -400,7 +400,7 @@ id (PK, SERIAL)
 first_name VARCHAR(100)
 last_name VARCHAR(100)
 email VARCHAR(255) UNIQUE
-password VARCHAR(255) -- BCrypt gehashed
+password VARCHAR(255) -- BCrypt hashed
 role ENUM (ADMIN, RECRUITER, CANDIDATE)
 active BOOLEAN DEFAULT true
 created_at TIMESTAMP DEFAULT NOW()
@@ -434,30 +434,30 @@ id (PK, SERIAL)
 candidate_id (FK → candidates.id)
 job_offer_id (FK → job_offers.id)
 status VARCHAR(50) -- PENDING, REVIEWED, ACCEPTED, REJECTED
-UNIQUE(candidate_id, job_offer_id) -- Duplikate verhindern
+UNIQUE(candidate_id, job_offer_id) -- Prevent duplicates
 ```
 
 ---
 
-## Konfiguration
+## Configuration
 
-### Umgebungsvariablen
+### Environment Variables
 
 ```bash
-# Datenbank
+# Database
 SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/job_application_db
 SPRING_DATASOURCE_USERNAME=postgres
 SPRING_DATASOURCE_PASSWORD=postgres
 
-# JWT Sicherheit
+# JWT Security
 APP_JWT_SECRET=YourSecretKeyWithAtLeast64CharactersForHS512SigningAlgorithm
-APP_JWT_EXPIRATION=3600  # Sekunden (1 Stunde)
+APP_JWT_EXPIRATION=3600  # seconds (1 hour)
 
-# Profile
+# Profiles
 SPRING_PROFILES_ACTIVE=dev  # dev, prod, test
 ```
 
-### application.yml Struktur
+### application.yml Structure
 
 ```yaml
 spring:
@@ -466,7 +466,7 @@ spring:
   
   jpa:
     hibernate:
-      ddl-auto: validate  # Niemals auto-create in Production
+      ddl-auto: validate  # Never auto-create in production
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   
   datasource:
@@ -486,76 +486,76 @@ app:
 
 ---
 
-## Komplette API-Referenz
+## Complete API Reference
 
-### Authentifizierungs-Endpunkte
+### Authentication Endpoints
 
-| Methode | Endpunkt | Rolle | Beschreibung |
-|---------|----------|-------|-------------|
-| POST | `/api/auth/register` | Public | Neues Benutzerkonto erstellen |
-| POST | `/api/auth/login` | Public | Authentifizierung & JWT erhalten |
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| POST | `/api/auth/register` | Public | Create new user account |
+| POST | `/api/auth/login` | Public | Authenticate & receive JWT |
 
-### Kandidaten-Endpunkte
+### Candidate Endpoints
 
-| Methode | Endpunkt | Rolle | Beschreibung |
-|---------|----------|-------|-------------|
-| GET | `/api/candidates` | RECRUITER, ADMIN | Alle Kandidaten auflisten |
-| GET | `/api/candidates/{id}` | RECRUITER, ADMIN | Kandidatendetails abrufen |
-| POST | `/api/candidates` | RECRUITER, ADMIN | Kandidaten erstellen |
-| PUT | `/api/candidates/{id}` | RECRUITER, ADMIN | Kandidaten aktualisieren |
-| DELETE | `/api/candidates/{id}` | ADMIN | Kandidaten löschen |
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| GET | `/api/candidates` | RECRUITER, ADMIN | List all candidates |
+| GET | `/api/candidates/{id}` | RECRUITER, ADMIN | Get candidate details |
+| POST | `/api/candidates` | RECRUITER, ADMIN | Create candidate |
+| PUT | `/api/candidates/{id}` | RECRUITER, ADMIN | Update candidate |
+| DELETE | `/api/candidates/{id}` | ADMIN | Delete candidate |
 
-### Job-Angebots-Endpunkte
+### Job Offer Endpoints
 
-| Methode | Endpunkt | Rolle | Beschreibung |
-|---------|----------|-------|-------------|
-| GET | `/api/jobs` | Public | Alle Job-Angebote auflisten |
-| GET | `/api/jobs/{id}` | Public | Job-Angebot-Details abrufen |
-| POST | `/api/jobs` | RECRUITER, ADMIN | Job-Angebot erstellen |
-| PUT | `/api/jobs/{id}` | RECRUITER, ADMIN | Job-Angebot aktualisieren |
-| DELETE | `/api/jobs/{id}` | ADMIN | Job-Angebot löschen |
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| GET | `/api/jobs` | Public | List all job offers |
+| GET | `/api/jobs/{id}` | Public | Get job offer details |
+| POST | `/api/jobs` | RECRUITER, ADMIN | Create job offer |
+| PUT | `/api/jobs/{id}` | RECRUITER, ADMIN | Update job offer |
+| DELETE | `/api/jobs/{id}` | ADMIN | Delete job offer |
 
-### Bewerbungs-Endpunkte
+### Application Endpoints
 
-| Methode | Endpunkt | Rolle | Beschreibung |
-|---------|----------|-------|-------------|
-| GET | `/api/applications` | RECRUITER, ADMIN | Alle Bewerbungen auflisten |
-| GET | `/api/applications/{id}` | RECRUITER, ADMIN | Bewerbungsdetails abrufen |
-| POST | `/api/applications` | CANDIDATE, RECRUITER | Bewerbung erstellen |
+| Method | Endpoint | Role | Description |
+|--------|----------|------|-------------|
+| GET | `/api/applications` | RECRUITER, ADMIN | List all applications |
+| GET | `/api/applications/{id}` | RECRUITER, ADMIN | Get application details |
+| POST | `/api/applications` | CANDIDATE, RECRUITER | Create application |
 
-### Gesundheit & Überwachung
+### Health & Monitoring
 
-| Endpunkt | Zugriff | Zweck |
+| Endpoint | Access | Purpose |
 |----------|--------|---------|
-| `/swagger-ui.html` | Public | Interaktive API-Dokumentation |
-| `/v3/api-docs` | Public | OpenAPI JSON Schema |
-| `/actuator/health` | Public | Anwendungs-Gesundheitsstatus |
-| `/actuator/**` | ADMIN | Erweiterte Metriken & Diagnostik |
+| `/swagger-ui.html` | Public | Interactive API documentation |
+| `/v3/api-docs` | Public | OpenAPI JSON schema |
+| `/actuator/health` | Public | Application health status |
+| `/actuator/**` | ADMIN | Advanced metrics & diagnostics |
 
 ---
 
-## Entwicklungs-Workflows
+## Development Workflows
 
-### Tests ausführen
+### Running Tests
 
 ```bash
-# Nur Unit Tests
+# Unit tests only
 ./mvnw test
 
-# Integration Tests (erfordert Docker)
+# Integration tests (requires Docker)
 ./mvnw verify
 
-# Mit Coverage-Bericht
+# With coverage report
 ./mvnw clean test jacoco:report
 ```
 
-### Code-Qualität
+### Code Quality
 
 ```bash
-# Code formatieren
+# Format code
 ./mvnw spotless:apply
 
-# Statische Analyse
+# Static analysis
 ./mvnw checkstyle:check pmd:check
 ```
 
@@ -566,10 +566,10 @@ app:
 ### Docker Build & Deploy
 
 ```bash
-# Docker Image bauen
+# Build Docker image
 docker build -t job-app:1.0 .
 
-# Container mit PostgreSQL ausführen
+# Run container with PostgreSQL
 docker run --name job-app \
   --link postgres:db \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/job_application_db \
@@ -578,63 +578,63 @@ docker run --name job-app \
   job-app:1.0
 ```
 
-### Production Checkliste
+### Production Checklist
 
-- [ ] Setzen Sie `SPRING_PROFILES_ACTIVE=prod`
-- [ ] Konfigurieren Sie starken `APP_JWT_SECRET` (64+ Zeichen)
-- [ ] Aktivieren Sie Flyway-Migrationen (`spring.flyway.enabled=true`)
-- [ ] Setzen Sie `spring.jpa.hibernate.ddl-auto=validate`
-- [ ] Konfigurieren Sie CORS für Production Domain
-- [ ] Verwenden Sie HTTPS/TLS in Reverse Proxy
-- [ ] Richten Sie Datenbank-Backups ein
-- [ ] Aktivieren Sie Anwendungs-Überwachung (Actuator)
-- [ ] Konfigurieren Sie angemessene Logging-Level
+- [ ] Set `SPRING_PROFILES_ACTIVE=prod`
+- [ ] Configure strong `APP_JWT_SECRET` (64+ characters)
+- [ ] Enable Flyway migrations (`spring.flyway.enabled=true`)
+- [ ] Set `spring.jpa.hibernate.ddl-auto=validate`
+- [ ] Configure CORS for production domain
+- [ ] Use HTTPS/TLS in reverse proxy
+- [ ] Set up database backups
+- [ ] Enable application monitoring (Actuator)
+- [ ] Configure appropriate logging levels
 
 ### CI/CD Pipeline (GitHub Actions)
 
-Befindet sich in `.github/workflows/maven.yml`
+Located in `.github/workflows/maven.yml`
 
-**Auslöser:**
-- Bei jedem `push` zum `main` Branch
-- Bei `pull_request` Erstellung
+**Triggers:**
+- On every `push` to `main` branch
+- On `pull_request` creation
 
-**Schritte:**
-1. Mit Maven bauen (`mvn clean install`)
-2. Unit Tests ausführen
-3. Integration Tests ausführen (mit Testcontainers)
-4. Test-Bericht generieren
+**Steps:**
+1. Build with Maven (`mvn clean install`)
+2. Run unit tests
+3. Run integration tests (with Testcontainers)
+4. Generate test report
 
-Status anschauen: [![Java CI with Maven](https://github.com/Nikolaspc/job-application-management-backend/actions/workflows/maven.yml/badge.svg)](https://github.com/Nikolaspc/job-application-management-backend/actions/workflows/maven.yml)
+View status: [![Java CI with Maven](https://github.com/Nikolaspc/job-application-management-backend/actions/workflows/maven.yml/badge.svg)](https://github.com/Nikolaspc/job-application-management-backend/actions/workflows/maven.yml)
 
 ---
 
-## Fehlerbehebung
+## Troubleshooting
 
-### Port bereits in Verwendung
+### Port Already in Use
 
 ```bash
-# Prozess auf Port 8080 finden und beenden
+# Find and kill process on port 8080
 lsof -i :8080
 kill -9 <PID>
 
-# Oder verwenden Sie einen anderen Port
+# Or use a different port
 ./mvnw spring-boot:run -Dspring-boot.run.arguments='--server.port=8081'
 ```
 
-### Datenbankverbindung fehlgeschlagen
+### Database Connection Failed
 
 ```bash
-# Überprüfen Sie, ob PostgreSQL läuft
+# Verify PostgreSQL is running
 docker ps | grep postgres
 
-# Überprüfen Sie das Verbindungszeichenfolgen-Format
-# ✓ Richtig: jdbc:postgresql://localhost:5432/job_application_db
-# ✗ Falsch:  postgres://localhost:5432/job_application_db
+# Check connection string format
+# ✓ Correct: jdbc:postgresql://localhost:5432/job_application_db
+# ✗ Wrong:  postgres://localhost:5432/job_application_db
 ```
 
-### JWT Token abgelaufen oder ungültig
+### JWT Token Expired or Invalid
 
-**Fehler-Antwort:**
+**Error Response:**
 ```json
 {
   "timestamp": "2025-01-04T12:00:00",
@@ -645,14 +645,14 @@ docker ps | grep postgres
 }
 ```
 
-**Lösung:**
-- Token über `/api/auth/login` neu generieren
-- Überprüfen Sie die `app.jwt.expiration` Einstellung
-- Überprüfen Sie, dass JWT Secret zwischen Generierung und Validierung übereinstimmt
+**Solution:**
+- Regenerate token via `/api/auth/login`
+- Check `app.jwt.expiration` setting
+- Verify JWT secret matches between generation & validation
 
-### Validierungsfehler
+### Validation Errors
 
-**Fehler-Antwort:**
+**Error Response:**
 ```json
 {
   "status": 400,
@@ -666,107 +666,107 @@ docker ps | grep postgres
 }
 ```
 
-**Häufige Probleme:**
-- Email-Format: muss `@` Domain enthalten
-- Datum-Format: muss `yyyy-MM-dd` sein
-- Felder mit `@NotBlank`: dürfen nicht leer sein
-- Altersanforderung: Minimum 18 Jahre
+**Common Issues:**
+- Email format: must include `@` domain
+- Date format: must be `yyyy-MM-dd`
+- Fields marked `@NotBlank`: cannot be empty
+- Age requirement: minimum 18 years old
 
 ---
 
 ## Best Practices
 
-### Sicherheits-Richtlinien
+### Security Guidelines
 
-1. **Niemals Geheimnisse committen** — Verwenden Sie Umgebungsvariablen
+1. **Never commit secrets** — Use environment variables
    ```bash
-   # ✓ Gut
+   # ✓ Good
    APP_JWT_SECRET=${RANDOM_64_CHAR_KEY}
    
-   # ✗ Schlecht
+   # ✗ Bad
    app.jwt.secret: ThisIsMySecretKey123
    ```
 
-2. **Passwort-Stärke** — Erzwingen Sie Mindestens 8 Zeichen, Sonderzeichen
+2. **Password strength** — Enforce minimum 8 characters, special characters
 
-3. **CORS-Konfiguration** — Einschränken auf bekannte Frontend-Origins
+3. **CORS configuration** — Restrict to known frontend origins
    ```java
    // In SecurityConfig.java
    config.setAllowedOrigins(Arrays.asList("https://yourdomain.com"));
    ```
 
-4. **Rate Limiting** — Implementieren Sie zum Schutz vor Brute-Force-Angriffen
+4. **Rate limiting** — Consider implementing to prevent brute-force attacks
 
-### Leistungs-Optimierung
+### Performance Optimization
 
-1. **Lazy Loading** — Relationships verwenden `FetchType.LAZY`
-2. **Pagination** — Fügen Sie `Pageable` für große Datensätze hinzu
-3. **Caching** — Erwägen Sie `@Cacheable` für häufig zugegriffene Daten
-4. **Datenbank-Indexierung** — Fügen Sie Indizes für häufig abgefragte Spalten hinzu
+1. **Lazy Loading** — Relationships use `FetchType.LAZY`
+2. **Pagination** — Add `Pageable` for large result sets
+3. **Caching** — Consider `@Cacheable` for frequently accessed data
+4. **Database Indexing** — Add indexes on frequently queried columns
 
-### Code-Qualitäts-Standards
+### Code Quality Standards
 
-1. **REST-Konventionen befolgen** — Resource-orientierte Endpunkte
-2. **Konsistente Benennung** — camelCase für Java, snake_case für DB
-3. **Umfassendes Logging** — Verwenden Sie `@Slf4j` zum Debugging
-4. **Transaktions-Umfang** — Halten Sie `@Transactional` fokussiert
-
----
-
-## Technischer Fahrplan & Zukünftige Verbesserungen
-
-### Phase 2 (Geplant)
-
-- [ ] **Pagination & Filterung** — Unterstützung für `Pageable` für große Datensätze
-- [ ] **Soft Deletes** — Logisches Löschen mit Zeitstempel-Tracking
-- [ ] **Email-Benachrichtigungen** — Bestätigungs-Emails bei Bewerbungseingang
-- [ ] **Erweiterte Suche** — Elasticsearch-Integration für Volltext-Job-Suche
-- [ ] **Datei-Uploads** — Resume/CV-Speicherung in der Cloud (AWS S3, GCS)
-- [ ] **API Rate Limiting** — Schutz vor Brute-Force-Angriffen
-- [ ] **Refresh Tokens** — Verbesserte Sicherheit mit Token-Rotation
-
-### Phase 3 (Langfristig)
-
-- [ ] **Microservices-Architektur** — Aufteilung in Auth, Jobs, Applications Services
-- [ ] **Message Queue** — Async Verarbeitung mit RabbitMQ/Kafka
-- [ ] **Multi-Tenancy** — Unterstützung mehrerer Recruiter mit isolierten Daten
-- [ ] **Analytics Dashboard** — Metriken zu Bewerbungserfolgsquoten
-- [ ] **Mobile App** — Native iOS/Android Clients
+1. **Follow REST conventions** — Resource-oriented endpoints
+2. **Consistent naming** — camelCase for Java, snake_case for DB
+3. **Comprehensive logging** — Use `@Slf4j` for debugging
+4. **Transaction scope** — Keep `@Transactional` focused
 
 ---
 
-## Abhängigkeiten Highlights
+## Technical Roadmap & Future Enhancements
+
+### Phase 2 (Planned)
+
+- [ ] **Pagination & Filtering** — Add `Pageable` support for large datasets
+- [ ] **Soft Deletes** — Logical deletion with timestamp tracking
+- [ ] **Email Notifications** — Send confirmation emails on application submission
+- [ ] **Advanced Search** — Elasticsearch integration for full-text job search
+- [ ] **File Uploads** — Resume/CV storage in cloud (AWS S3, GCS)
+- [ ] **API Rate Limiting** — Prevent brute-force attacks
+- [ ] **Refresh Tokens** — Enhance security with token rotation
+
+### Phase 3 (Long-term)
+
+- [ ] **Microservices Architecture** — Split into Auth, Jobs, Applications services
+- [ ] **Message Queue** — Async processing with RabbitMQ/Kafka
+- [ ] **Multi-tenancy** — Support multiple recruiters with isolated data
+- [ ] **Analytics Dashboard** — Metrics on application success rates
+- [ ] **Mobile App** — Native iOS/Android clients
+
+---
+
+## Dependencies Highlights
 
 ### Core Framework
-- **Spring Boot 3.4.1** — Neuestes Framework mit GraalVM-Unterstützung
-- **Spring Security 6** — OAuth2-ready, modernes Sicherheitsmodell
-- **Spring Data JPA** — Reduziert Boilerplate mit auto-implementierten Abfragen
+- **Spring Boot 3.4.1** — Latest framework with GraalVM support
+- **Spring Security 6** — OAuth2 ready, modern security model
+- **Spring Data JPA** — Reduces boilerplate with auto-implemented queries
 
-### Daten & Migration
-- **PostgreSQL 14** — Bewährte, Enterprise-Datenbank
-- **Flyway** — Versionskontrolle für Datenbank-Schema
-- **Lombok** — Reduziert Getter/Setter Boilerplate
+### Data & Migration
+- **PostgreSQL 14** — Proven, enterprise-grade database
+- **Flyway** — Version control for database schema
+- **Lombok** — Reduces getter/setter boilerplate
 
-### API-Dokumentation
-- **SpringDoc OpenAPI 3** — Auto-generiert Swagger/OpenAPI Docs
-- **Swagger UI** — Interaktive API-Tests im Browser
+### API Documentation
+- **SpringDoc OpenAPI 3** — Auto-generates Swagger/OpenAPI docs
+- **Swagger UI** — Interactive API testing in browser
 
 ### Testing
-- **JUnit 5** — Modernes Test-Framework mit Parametrisierung
-- **Mockito** — Mock-Objekte für Unit Tests
-- **Testcontainers** — Echte Datenbank für Integration Tests
+- **JUnit 5** — Modern testing framework with parameterization
+- **Mockito** — Mock objects for unit testing
+- **Testcontainers** — Real database for integration tests
 
 ### Mapping
-- **MapStruct 1.5.5** — Compile-Time, typsicheres DTO-Mapping
-- **JJWT 0.12.x** — JWT Generierung & Validierung
+- **MapStruct 1.5.5** — Compile-time, type-safe DTO mapping
+- **JJWT 0.12.x** — JWT generation & validation
 
 ---
 
-## Metriken & Überwachung
+## Metrics & Monitoring
 
-### Anwendungs-Gesundheit
+### Application Health
 
-Zugang über: **http://localhost:8080/actuator/health**
+Access via: **http://localhost:8080/actuator/health**
 
 ```json
 {
@@ -782,53 +782,53 @@ Zugang über: **http://localhost:8080/actuator/health**
 }
 ```
 
-### Leistungs-Überwachung
+### Performance Monitoring
 
-- Aktivieren mit: `management.endpoints.web.exposure.include=*`
-- Metriken anschauen: `/actuator/metrics`
-- Häufige Endpunkte:
+- Enable with: `management.endpoints.web.exposure.include=*`
+- View metrics at: `/actuator/metrics`
+- Common endpoints:
     - `/actuator/metrics/jvm.memory.usage`
     - `/actuator/metrics/http.server.requests`
     - `/actuator/metrics/process.uptime`
 
 ---
 
-## Verifikations-Checkliste
+## Verification Checklist
 
-Dieses README wurde gegen die tatsächliche Projektstruktur überprüft:
+This README has been verified against the actual project structure:
 
-- ✅ **Package-Struktur** — Entspricht `com.nikolaspc.jobapp` mit allen 8 Ebenen
-- ✅ **Controller** — Alle 4 Controller dokumentiert
-- ✅ **Services** — Interface + Implementierungs-Muster verifiziert
-- ✅ **Repositories** — Benutzerdefinierte Abfrage-Methoden aufgelistet
-- ✅ **Sicherheit** — JWT HS512, BCrypt(12), RBAC implementiert
-- ✅ **Testing** — 9 Test-Klassen mit Unit & Integration Tests
-- ✅ **Datenbank** — Schema, Migrationen, Relationships dokumentiert
-- ✅ **Konfiguration** — Alle Config-Klassen & Umgebungsvariablen aufgelistet
-- ✅ **API-Endpunkte** — 12+ Endpunkte mit rollenbasiertem Zugriff
-- ✅ **DTOs** — Record-basierte & POJO Muster verwendet
-- ✅ **Exception-Handling** — GlobalExceptionHandler mit custom Exceptions
-
----
-
-## Mitwirkende
-
-Beiträge sind willkommen. Bitte beachten Sie:
-
-1. Code folgt den Projekt-Style-Richtlinien
-2. Alle Tests bestehen: `./mvnw clean verify`
-3. Neue Features enthalten Tests
-4. Commit-Nachrichten sind beschreibend
+- ✅ **Package Structure** — Matches `com.nikolaspc.jobapp` with all 8 layers
+- ✅ **Controllers** — All 4 controllers documented
+- ✅ **Services** — Interface + Implementation pattern verified
+- ✅ **Repositories** — Custom query methods listed
+- ✅ **Security** — JWT HS512, BCrypt(12), RBAC implemented
+- ✅ **Testing** — 9 test classes covering unit & integration scenarios
+- ✅ **Database** — Schema, migrations, relationships documented
+- ✅ **Configuration** — All config classes & environment variables listed
+- ✅ **API Endpoints** — 12+ endpoints mapped with role-based access
+- ✅ **DTOs** — Record-based & POJO patterns both used
+- ✅ **Exception Handling** — GlobalExceptionHandler with custom exceptions
 
 ---
 
-## Lizenz
+## Contributing
 
-Dieses Projekt ist unter der MIT-Lizenz lizenziert. Siehe [LICENSE](LICENSE) Datei für Details.
+Contributions are welcome. Please ensure:
+
+1. Code follows the project's style guidelines
+2. All tests pass: `./mvnw clean verify`
+3. New features include tests
+4. Commit messages are descriptive
 
 ---
 
-## Autor
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
+
+---
+
+## Author
 
 **Nikolas Pérez Cvjetkovic**  
 Software Developer | Based in Germany 🇩🇪
@@ -838,14 +838,14 @@ Software Developer | Based in Germany 🇩🇪
 
 ---
 
-## Unterstützung
+## Support
 
-Bei Problemen, Feature-Anfragen oder Fragen:
+For issues, feature requests, or questions:
 
-- 🐛 [Issue öffnen](https://github.com/Nikolaspc/job-application-management-backend/issues)
-- 💬 [Diskussion starten](https://github.com/Nikolaspc/job-application-management-backend/discussions)
+- 🐛 [Open an Issue](https://github.com/Nikolaspc/job-application-management-backend/issues)
+- 💬 [Start a Discussion](https://github.com/Nikolaspc/job-application-management-backend/discussions)
 
 ---
 
-**Zuletzt aktualisiert:** Januar 2026  
-**Status:** ✅ Production-Ready | Vollständig dokumentiert | Enterprise Grade
+**Last Updated:** January 2026  
+**Status:** ✅ Production-Ready | Fully Documented | Enterprise Grade
