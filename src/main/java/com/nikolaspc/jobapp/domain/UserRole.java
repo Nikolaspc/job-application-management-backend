@@ -1,7 +1,13 @@
 package com.nikolaspc.jobapp.domain;
 
+/**
+ * Enumeration of system roles for RBAC (Role-Based Access Control).
+ */
 public enum UserRole {
-    ADMIN,      // Full access
-    RECRUITER,  // Can manage job offers and view applications
-    CANDIDATE   // Can view jobs and submit applications
+    // English: System administrator with full management capabilities
+    ADMIN,
+    // English: Company representative who posts jobs and manages applications
+    RECRUITER,
+    // English: Job seeker who views offers and applies
+    CANDIDATE
 }

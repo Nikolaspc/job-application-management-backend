@@ -1,4 +1,15 @@
 services:
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: jobapp-vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_ADDR: "http://0.0.0.0:8200"
+    cap_add:
+      - IPC_LOCK
+
   postgres-db:
     image: postgres:14-alpine
     container_name: jobapp-db
@@ -20,11 +31,14 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Injecting environment variables into the Spring Boot container
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/job_application_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      APP_JWT_SECRET: ${APP_JWT_SECRET:-ProductionReadySecretKeyMustBeSetInEnvironmentVariables}
+      VAULT_URI: http://vault:8200
+      VAULT_TOKEN: root
+      SPRING_PROFILES_ACTIVE: prod
     depends_on:
       postgres-db:
         condition: service_healthy
+      vault:
+        condition: service_started

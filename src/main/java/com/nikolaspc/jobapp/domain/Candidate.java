@@ -3,7 +3,6 @@ package com.nikolaspc.jobapp.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.domain.Persistable;
-
 import java.time.LocalDate;
 
 @Entity
@@ -16,25 +15,19 @@ import java.time.LocalDate;
 public class Candidate implements Persistable<Long> {
 
     @Id
-    // Eliminamos @GeneratedValue porque el ID vendrá del User
     private Long id;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-
-    @Column(unique = true, nullable = false)
-    private String email;
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id")
+    private User user;
 
     @Column(name = "date_of_birth", nullable = false)
     private LocalDate dateOfBirth;
 
-    // Control para que Spring Data JPA sepa que es un INSERT aunque tenga ID
     @Transient
     @Builder.Default
-    private boolean isNew = true;
+    private boolean isNewCandidate = true; // English: Renamed to avoid confusion with the method name
 
     @Override
     public Long getId() {
@@ -43,12 +36,13 @@ public class Candidate implements Persistable<Long> {
 
     @Override
     public boolean isNew() {
-        return isNew;
+        return isNewCandidate;
     }
 
-    @PostPersist
+    // English: Use PrePersist to ensure state is handled before Hibernate executes the INSERT
+    @PrePersist
     @PostLoad
     void markNotNew() {
-        this.isNew = false;
+        this.isNewCandidate = false;
     }
 }

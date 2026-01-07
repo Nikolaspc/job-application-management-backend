@@ -2,6 +2,7 @@ package com.nikolaspc.jobapp.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "job_applications")
@@ -11,7 +12,6 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class JobApplication {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,6 +24,15 @@ public class JobApplication {
     @JoinColumn(name = "job_offer_id", nullable = false)
     private JobOffer jobOffer;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String status;
+
+    @Column(name = "applied_at", nullable = false, updatable = false)
+    private LocalDateTime appliedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.appliedAt = LocalDateTime.now();
+        if (this.status == null) this.status = "PENDING";
+    }
 }

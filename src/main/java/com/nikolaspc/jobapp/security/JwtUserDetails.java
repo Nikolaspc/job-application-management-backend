@@ -4,6 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+/**
+ * Custom user details container for the Security Context.
+ * Stores essential user metadata extracted from the JWT.
+ */
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor

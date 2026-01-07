@@ -17,7 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * JwtTokenProvider updated for JJWT 0.12.x
+ * JwtTokenProvider updated for JJWT 0.12.x.
+ * Manages the lifecycle of JSON Web Tokens using secrets provided by Vault.
  */
 @Slf4j
 @Component
@@ -29,6 +30,9 @@ public class JwtTokenProvider {
     @Value("${app.jwt.expiration}")
     private long jwtExpirationInSeconds;
 
+    /**
+     * Extracts the signing key from the secret string retrieved via Vault.
+     */
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
@@ -44,7 +48,6 @@ public class JwtTokenProvider {
         claims.put("userId", userId);
 
         Date now = new Date();
-        // Convert seconds from config to milliseconds for Date
         Date expiryDate = new Date(now.getTime() + (jwtExpirationInSeconds * 1000));
 
         return Jwts.builder()
@@ -65,15 +68,21 @@ public class JwtTokenProvider {
         return UserRole.valueOf(role);
     }
 
+    /**
+     * Safely extracts the User ID from JWT claims.
+     */
     public Long getUserIdFromToken(String token) {
-        // Safe extraction of Long from claims
         Object userId = getClaims(token).get("userId");
-        if (userId instanceof Integer) {
-            return ((Integer) userId).longValue();
+        if (userId instanceof Number) {
+            return ((Number) userId).longValue();
         }
-        return (Long) userId;
+        return null;
     }
 
+    /**
+     * Validates the token against the current signing key.
+     * Required for BSI/OWASP compliance on integrity checks.
+     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser()
@@ -90,12 +99,9 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException ex) {
             log.error("Expired JWT token: {}", ex.getMessage());
             throw new JwtException("Expired JWT token");
-        } catch (UnsupportedJwtException ex) {
-            log.error("Unsupported JWT token: {}", ex.getMessage());
-            throw new JwtException("Unsupported JWT token");
-        } catch (IllegalArgumentException ex) {
-            log.error("JWT claims string is empty: {}", ex.getMessage());
-            throw new JwtException("JWT claims string is empty");
+        } catch (Exception ex) {
+            log.error("Token validation failed: {}", ex.getMessage());
+            throw new JwtException("Token validation failed");
         }
     }
 
@@ -105,9 +111,5 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    public long getTokenExpirationSeconds() {
-        return jwtExpirationInSeconds;
     }
 }

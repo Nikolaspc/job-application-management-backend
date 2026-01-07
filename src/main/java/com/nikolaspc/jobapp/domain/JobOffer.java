@@ -15,12 +15,11 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class JobOffer {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 200)
     private String title;
 
     @Column(nullable = false, columnDefinition = "TEXT")
@@ -29,7 +28,7 @@ public class JobOffer {
     @Column(nullable = false)
     private String location;
 
-    @Column(name = "employment_type", nullable = false)
+    @Column(name = "employment_type", nullable = false, length = 50)
     private String employmentType;
 
     @Builder.Default
@@ -42,17 +41,15 @@ public class JobOffer {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @JsonIgnore // Important: Prevents 500 errors during JSON serialization/deserialization
-    @OneToMany(mappedBy = "jobOffer", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OneToMany(mappedBy = "jobOffer", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @Builder.Default
     private List<JobApplication> applications = new ArrayList<>();
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
-        if (this.active == null) {
-            this.active = true;
-        }
+        if (this.active == null) this.active = true;
     }
 
     @PreUpdate

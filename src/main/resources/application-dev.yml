@@ -1,0 +1,17 @@
+# Development-specific configuration
+spring:
+  cloud:
+    vault:
+      fail-fast: false # English: Don't stop the app if Vault is down during local dev
+
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    com.nikolaspc.jobapp: DEBUG
+    # English: Log vault interactions for debugging
+    org.springframework.cloud.vault: DEBUG

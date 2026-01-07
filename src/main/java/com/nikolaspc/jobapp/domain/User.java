@@ -10,6 +10,10 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+/**
+ * User Entity representing the core authentication and profile data.
+ * Audited with timestamps and secured with role-based access.
+ */
 @Entity
 @Table(name = "users", uniqueConstraints = {@UniqueConstraint(columnNames = "email")})
 @Data
@@ -53,4 +57,12 @@ public class User {
 
     @Column
     private LocalDateTime updatedAt;
+
+    /**
+     * English: Automatically updates the updatedAt timestamp before every update operation.
+     */
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

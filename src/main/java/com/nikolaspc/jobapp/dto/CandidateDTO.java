@@ -1,5 +1,6 @@
 package com.nikolaspc.jobapp.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CandidateDTO {
     private Long id;
 
@@ -28,6 +30,6 @@ public class CandidateDTO {
     private String email;
 
     @NotNull(message = "Date of birth is required")
-    @Past(message = "Date of birth must be in the past") // Mejora: Validación lógica
+    @Past(message = "Date of birth must be in the past")
     private LocalDate dateOfBirth;
 }

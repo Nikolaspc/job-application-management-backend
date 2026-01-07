@@ -14,17 +14,18 @@ import java.util.Optional;
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
     /**
-     * Finds a candidate by their unique email address.
-     * Required by CandidateRepositoryIT and service logic.
-     * * @param email The email to search for.
+     * Finds a candidate by the email of their associated user.
+     * English: We navigate from Candidate to User entity and then to the email field.
+     * @param email The email to search for.
      * @return An Optional containing the candidate if found.
      */
-    Optional<Candidate> findByEmail(String email);
+    Optional<Candidate> findByUserEmail(String email);
 
     /**
-     * Checks if a candidate exists with the given email.
-     * * @param email The email to check.
+     * Checks if a candidate exists with the given email through their user profile.
+     * English: Required by service logic to prevent duplicate registrations.
+     * @param email The email to check.
      * @return true if it exists, false otherwise.
      */
-    boolean existsByEmail(String email);
+    boolean existsByUserEmail(String email);
 }

@@ -1,0 +1,21 @@
+# Production Configuration (BSI/GDPR Compliant)
+spring:
+  jpa:
+    show-sql: false # English: Prevent leaking PII in logs
+    properties:
+      hibernate:
+        format_sql: false
+
+# Documentation is strictly disabled in production for security
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+logging:
+  level:
+    root: INFO
+    com.nikolaspc.jobapp: INFO
+    # English: Only log security warnings or errors in production
+    org.springframework.security: WARN

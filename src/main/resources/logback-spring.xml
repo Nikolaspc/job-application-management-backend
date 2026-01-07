@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property name="LOG_PATTERN" value="%d{yyyy-MM-dd HH:mm:ss} [%thread] %X{correlationId} %-5level %logger{36} - %msg%n" />
+    <property name="AUDIT_LOG_PATH" value="./logs/audit" />
+
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="AuditFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${AUDIT_LOG_PATH}/audit.log</file>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [AUDIT] %X{correlationId} - %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${AUDIT_LOG_PATH}/audit-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory> </rollingPolicy>
+    </appender>
+
+    <springProfile name="dev">
+        <root level="INFO">
+            <appender-ref ref="Console" />
+        </root>
+        <logger name="audit-logger" level="INFO" additivity="false">
+            <appender-ref ref="Console" />
+            <appender-ref ref="AuditFile" />
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <root level="WARN">
+            <appender-ref ref="Console" />
+        </root>
+        <logger name="audit-logger" level="INFO" additivity="false">
+            <appender-ref ref="AuditFile" />
+        </logger>
+    </springProfile>
+</configuration>

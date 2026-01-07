@@ -1,0 +1,36 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: job-application-backend
+
+  # English: Enable Vault configuration. Secrets will be fetched from secret/job-application-backend
+  cloud:
+    vault:
+      enabled: true
+      uri: ${VAULT_URI:http://localhost:8200}
+      authentication: TOKEN
+      token: ${VAULT_TOKEN:root}
+      kv:
+        enabled: true
+        backend: secret
+        default-context: job-application-backend
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/job_application_db}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    # English: Password will be fetched from Vault in production
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+
+app:
+  jwt:
+    # English: Notice secret is GONE. It must exist in Vault as "app.jwt.secret"
+    expiration: ${APP_JWT_EXPIRATION:86400}
+
+# ... rest of your management and springdoc config ...
