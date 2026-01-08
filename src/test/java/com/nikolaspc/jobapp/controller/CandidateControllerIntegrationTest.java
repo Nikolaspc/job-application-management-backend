@@ -2,7 +2,6 @@ package com.nikolaspc.jobapp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nikolaspc.jobapp.dto.CandidateDTO;
-import com.nikolaspc.jobapp.exception.ResourceNotFoundException;
 import com.nikolaspc.jobapp.security.JwtTokenProvider;
 import com.nikolaspc.jobapp.service.CandidateService;
 import org.junit.jupiter.api.DisplayName;
@@ -94,7 +93,6 @@ class CandidateControllerIntegrationTest {
                 .dateOfBirth(LocalDate.of(1995, 5, 15))
                 .build();
 
-        // Fixed: Using save() instead of create()
         when(service.save(any(CandidateDTO.class))).thenReturn(createdDTO);
 
         mockMvc.perform(post("/api/candidates")
@@ -117,14 +115,14 @@ class CandidateControllerIntegrationTest {
                 .dateOfBirth(LocalDate.of(1995, 5, 15))
                 .build();
 
-        // Fixed: Using save() instead of create()
+        // English: Use IllegalArgumentException to trigger 400 Bad Request via GlobalExceptionHandler
         when(service.save(any(CandidateDTO.class)))
-                .thenThrow(new RuntimeException("Email already exists"));
+                .thenThrow(new IllegalArgumentException("Email already exists"));
 
         mockMvc.perform(post("/api/candidates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicateDTO)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest()); // English: Expecting 400 instead of 500
 
         verify(service, times(1)).save(any(CandidateDTO.class));
     }

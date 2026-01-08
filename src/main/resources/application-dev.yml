@@ -1,17 +1,40 @@
-# Development-specific configuration
+# This profile is active during local development.
+# It provides fallbacks to allow running the app without a live Vault instance.
+
 spring:
   cloud:
     vault:
-      fail-fast: false # English: Don't stop the app if Vault is down during local dev
+      # English: Set to false to bypass Vault requirements during rapid development.
+      # You can enable it by passing -DVAULT_ENABLED=true or setting the ENV var.
+      enabled: ${VAULT_ENABLED:false}
+      fail-fast: false
 
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: update # English: Auto-update schema for faster iterations
     properties:
       hibernate:
         format_sql: true
 
+# English: Enable Swagger/OpenAPI docs for development
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+app:
+  jwt:
+    # English: Fallback secret for local development.
+    # This ensures the ApplicationContext loads even if Vault is disabled.
+    # WARNING: Never use this secret in Production environments.
+    secret: ${APP_JWT_SECRET:LocalDevOnlySecretKeyForHS512ComplianceMustBeAtLeast64CharsLong!!!}
+  security:
+    cors:
+      allowed-origins: "http://localhost:3000"
+
 logging:
   level:
     com.nikolaspc.jobapp: DEBUG
-    # English: Log vault interactions for debugging
-    org.springframework.cloud.vault: DEBUG
+    org.springframework.cloud.vault: INFO

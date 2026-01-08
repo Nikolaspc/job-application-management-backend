@@ -24,20 +24,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(
             AccessDeniedException ex, HttpServletRequest request) {
-
-        // English: Log as WARN for security monitoring (SIEM integration ready)
         log.warn("SECURITY - ACCESS DENIED: Path [{}], Method [{}], IP [{}]",
                 request.getRequestURI(), request.getMethod(), request.getRemoteAddr());
-
         return buildErrorResponse(HttpStatus.FORBIDDEN, "Access Denied - Insufficient Permissions", request, null);
     }
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(
             AuthenticationException ex, HttpServletRequest request) {
-
         log.info("Auth Failure: Path [{}], Message [{}]", request.getRequestURI(), ex.getMessage());
-
         return buildErrorResponse(HttpStatus.UNAUTHORIZED, "Authentication Failed", request, null);
     }
 
@@ -52,6 +47,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(
             BadRequestException ex, HttpServletRequest request) {
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
+    }
+
+    // New: Handle IllegalArgumentException for duplicate emails and invalid arguments (Status 400)
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex, HttpServletRequest request) {
+        log.debug("Illegal Argument at {}: {}", request.getRequestURI(), ex.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request, null);
     }
 
@@ -75,10 +78,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, HttpServletRequest request) {
-
-        // English: Log full stack trace for internal review, but hide details from public client
         log.error("CRITICAL ERROR: [{}] at path [{}]", ex.getMessage(), request.getRequestURI(), ex);
-
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR,
                 "An unexpected internal error occurred. Technical ID: " + LocalDateTime.now().getNano(),
                 request, null);

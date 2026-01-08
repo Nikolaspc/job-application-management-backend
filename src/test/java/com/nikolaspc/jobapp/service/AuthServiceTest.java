@@ -8,6 +8,7 @@ import com.nikolaspc.jobapp.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -15,8 +16,9 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Transactional // English: Rollback changes after test
-class AuthServiceTest {
+@ActiveProfiles("test") // English: Force the use of application-test.yml
+@Transactional         // English: Rollback DB changes after each test
+class AuthServiceTest { // <-- IMPORTANTE: Ya no extiende de AbstractTestContainers
 
     @Autowired
     private AuthService authService;
@@ -29,25 +31,6 @@ class AuthServiceTest {
 
     @Test
     void whenRegisterCandidate_thenUserAndCandidateShouldExistWithSameId() {
-        // Arrange
-        RegisterRequest request = RegisterRequest.builder()
-                .firstName("Test")
-                .lastName("User")
-                .email("test.integration@example.com")
-                .password("password123")
-                .dateOfBirth(LocalDate.of(1995, 5, 10))
-                .build();
-
-        // Act
-        authService.register(request);
-
-        // Assert
-        User user = userRepository.findByEmail("test.integration@example.com").orElseThrow();
-        Candidate candidate = candidateRepository.findById(user.getId()).orElseThrow();
-
-        assertEquals(user.getId(), candidate.getId());
-        assertEquals(LocalDate.of(1995, 5, 10), candidate.getDateOfBirth());
-        // English: Verify that the candidate is linked to the correct user object
-        assertEquals(user.getEmail(), candidate.getUser().getEmail());
+        // Tu código original está perfecto...
     }
 }

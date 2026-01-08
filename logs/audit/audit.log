@@ -1,0 +1,2 @@
+2026-01-08 20:40:11 [AUDIT] 95027ca5-f737-4387-aa43-9be222580f04 - SECURITY_EVENT | Action: REGISTER | User: RegisterRequest(firstName=Nikolas, lastName=PC, email=nikolas@test.com, password=Password123!, role=CANDIDATE, dateOfBirth=null) | Status: SUCCESS
+2026-01-08 20:43:18 [AUDIT] 58ceff5c-0afa-4441-9793-88f03f832416 - SECURITY_EVENT | Action: LOGIN | User: AuthRequest(email=nikolas@test.com, password=Password123!) | Status: SUCCESS

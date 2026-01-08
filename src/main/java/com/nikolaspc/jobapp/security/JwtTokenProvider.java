@@ -59,6 +59,14 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     * Returns the token expiration time in seconds for the AuthResponse.
+     * (English comment as per user preference)
+     */
+    public long getTokenExpirationSeconds() {
+        return this.jwtExpirationInSeconds;
+    }
+
     public String getEmailFromToken(String token) {
         return getClaims(token).getSubject();
     }
@@ -68,9 +76,6 @@ public class JwtTokenProvider {
         return UserRole.valueOf(role);
     }
 
-    /**
-     * Safely extracts the User ID from JWT claims.
-     */
     public Long getUserIdFromToken(String token) {
         Object userId = getClaims(token).get("userId");
         if (userId instanceof Number) {
@@ -79,10 +84,6 @@ public class JwtTokenProvider {
         return null;
     }
 
-    /**
-     * Validates the token against the current signing key.
-     * Required for BSI/OWASP compliance on integrity checks.
-     */
     public boolean validateToken(String token) {
         try {
             Jwts.parser()

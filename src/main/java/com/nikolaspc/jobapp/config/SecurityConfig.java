@@ -66,10 +66,12 @@ public class SecurityConfig {
                     // 1. Auth & Public Endpoints
                     authz.requestMatchers("/api/auth/**", "/api/v1/auth/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "/api/jobs/**", "/api/v1/jobs/**").permitAll()
-                            .requestMatchers("/actuator/health/**").permitAll();
+                            // English: Public health check (Important: match both /health and /health/**)
+                            .requestMatchers("/actuator/health", "/actuator/health/**").permitAll();
 
                     // 2. Conditional Swagger Access
                     if (swaggerEnabled) {
+                        log.info("Swagger/OpenAPI endpoints are allowed for this session.");
                         authz.requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
@@ -79,7 +81,8 @@ public class SecurityConfig {
                         ).permitAll();
                     }
 
-                    // 3. Management & Monitoring
+                    // 3. Management & Monitoring (Protected)
+                    // English: Any other actuator endpoint requires ADMIN role
                     authz.requestMatchers("/actuator/**").hasRole("ADMIN");
 
                     // 4. Default Lock
