@@ -3,7 +3,7 @@
 > **Professional Backend REST API for Recruitment Process Management**  
 > Built with Spring Boot 3.4.1, JWT Security, PostgreSQL, and HashiCorp Vault Integration
 
-[![Build Status](https://github.com/Nikolaspc/job-application-backend/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/Nikolaspc/job-application-backend/actions)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/Nikolaspc/job-application-backend/maven.yml?branch=main&label=build)](https://github.com/Nikolaspc/job-application-backend/actions)
 [![Java Version](https://img.shields.io/badge/Java-17-orange.svg)](https://adoptium.net/)
 [![Coverage](https://img.shields.io/badge/coverage-85%25-brightgreen.svg)](https://github.com/Nikolaspc/job-application-backend)
 
